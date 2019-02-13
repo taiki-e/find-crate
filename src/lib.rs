@@ -87,7 +87,6 @@ extern crate toml;
 
 use std::{
     borrow::Cow,
-    collections::HashMap,
     fs::File,
     io::{self, Read as _Read}, // Rust 1.33+ => Read as _
     path::{Path, PathBuf},
@@ -203,7 +202,7 @@ impl<'a> Default for FindOptions<'a> {
 
 /// The package data. This has information on the current package name,
 /// original package name, and specified version.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package<'a> {
     /// The key of this dependency in the manifest.
     key: &'a str,
@@ -256,7 +255,7 @@ impl<'a> Package<'a> {
 /// Note that this item must be used in the context of proc-macro.
 #[derive(Debug, Clone)]
 pub struct Manifest<'a> {
-    manifest: HashMap<String, Value>,
+    manifest: Table,
     options: FindOptions<'a>,
 }
 
@@ -280,10 +279,10 @@ impl<'a> Manifest<'a> {
         }
 
         if !manifest_path.is_file() {
-            return Err(NotFoundManifestFile(manifest_path.to_owned()));
+            Err(NotFoundManifestFile(manifest_path.to_owned()))
+        } else {
+            Self::from_bytes(&open(&manifest_path)?)
         }
-
-        Self::from_bytes(&open(&manifest_path)?)
     }
 
     /// Constructs a new `Manifest` from the bytes.
@@ -292,7 +291,7 @@ impl<'a> Manifest<'a> {
     }
 
     /// Constructs a new `Manifest` from the raw manifest.
-    fn from_raw(manifest: HashMap<String, Value>) -> Self {
+    fn from_raw(manifest: Table) -> Self {
         Self {
             manifest,
             options: FindOptions::default(),
@@ -500,8 +499,8 @@ impl<'a> ManifestLock<'a> {
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var("CARGO_MANIFEST_DIR")
-        .map_err(|_| NotFoundManifestDir)
+    env::var_os("CARGO_MANIFEST_DIR")
+        .ok_or_else(|| NotFoundManifestDir)
         .map(PathBuf::from)
         .map(|mut manifest_path| {
             manifest_path.push("Cargo.toml");
