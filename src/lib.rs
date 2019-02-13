@@ -28,6 +28,9 @@
 //! As in this example, it is easy to handle cases where proc-macro is exported from multiple crates.
 //!
 //! ```rust
+//! # extern crate find_crate;
+//! # extern crate proc_macro2;
+//! # extern crate quote;
 //! use find_crate::find_crate;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
