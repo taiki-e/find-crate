@@ -79,7 +79,7 @@
 //!
 //! [`find_crate()`]: fn.find_crate.html
 
-#![doc(html_root_url = "https://docs.rs/find-crate/0.1.1")]
+#![doc(html_root_url = "https://docs.rs/find-crate/0.1.2")]
 #![deny(bare_trait_objects, elided_lifetimes_in_paths)]
 #![deny(missing_docs, missing_debug_implementations, unsafe_code)]
 

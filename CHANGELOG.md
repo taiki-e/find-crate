@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.1.2 - 2019-02-13
+
+* Implement `PartialEq` and `Eq` for `Package`.
+
 # 0.1.1 - 2019-02-13
 
 * Improve documentations.
