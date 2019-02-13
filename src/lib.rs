@@ -79,7 +79,7 @@
 //!
 //! [`find_crate()`]: fn.find_crate.html
 
-#![doc(html_root_url = "https://docs.rs/find-crate/0.1.2")]
+#![doc(html_root_url = "https://docs.rs/find-crate/0.2.0")]
 #![deny(missing_docs, missing_debug_implementations, unsafe_code)]
 #![cfg_attr(
     feature = "cargo-clippy",
@@ -169,7 +169,12 @@ impl error::Error for Error {
             _ => None,
         }
     }
-    #[cfg(not(stable_1_30))] // https://github.com/rust-lang/rust/blob/1.30.0/src/libstd/error.rs#L143
+    #[cfg(stable_1_30)] // https://github.com/rust-lang/rust/blob/1.30.0/src/libstd/error.rs#L143
+    #[allow(deprecated)]
+    fn cause(&self) -> Option<&error::Error> {
+        self.source()
+    }
+    #[cfg(not(stable_1_30))]
     fn cause(&self) -> Option<&error::Error> {
         match *self {
             Open(_, ref err) | Read(_, ref err) => Some(err),

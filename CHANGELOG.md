@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.2.0 - 2019-02-13
+
+* Support Rust 1.15
+
 # 0.1.2 - 2019-02-13
 
 * Implement `PartialEq` and `Eq` for `Package`.

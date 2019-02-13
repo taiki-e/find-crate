@@ -18,7 +18,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-find-crate = "0.1"
+find-crate = "0.2"
 ```
 
 Now, you can use find-crate:
