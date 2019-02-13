@@ -11,6 +11,7 @@ readme = "README.md"
 keywords = ["macros", "crate"]
 categories = ["development-tools::procedural-macro-helpers"]
 exclude = ["/.travis.yml"]
+build = "build.rs"
 
 [badges]
 # https://github.com/rust-lang/crates.io/issues/1392

@@ -80,18 +80,28 @@
 //! [`find_crate()`]: fn.find_crate.html
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.1.2")]
-#![deny(bare_trait_objects, elided_lifetimes_in_paths)]
 #![deny(missing_docs, missing_debug_implementations, unsafe_code)]
+#![cfg_attr(
+    feature = "cargo-clippy",
+    allow(
+        renamed_and_removed_lints,
+        redundant_field_names, // Rust 1.17+ => remove
+        const_static_lifetime, // Rust 1.17+ => remove
+        deprecated_cfg_attr, // Rust 1.30+ => remove
+        map_clone
+    )
+)]
 
 extern crate toml;
 
-use std::{
-    borrow::Cow,
-    fs::File,
-    io::{self, Read as _Read}, // Rust 1.33+ => Read as _
-    path::{Path, PathBuf},
-    {env, error, fmt, result},
-};
+use std::borrow::Cow;
+use std::env;
+use std::error;
+use std::fmt;
+use std::fs::File;
+use std::io::{self, Read as _Read}; // Rust 1.33+ => Read as _
+use std::path::{Path, PathBuf};
+use std::result;
 
 use toml::value::{Table, Value};
 
@@ -100,10 +110,11 @@ use self::Error::*;
 type Result<T> = result::Result<T, Error>;
 
 /// The kinds of dependencies searched by default.
-pub const DEFAULT_DEPENDENCIES: &[&str] = &_DEFAULT_DEPENDENCIES;
+pub const DEFAULT_DEPENDENCIES: &'static [&'static str] = &_DEFAULT_DEPENDENCIES;
 
 // for const_err
-const _DEFAULT_DEPENDENCIES: [&str; 3] = ["dependencies", "dev-dependencies", "build-dependencies"];
+const _DEFAULT_DEPENDENCIES: [&'static str; 3] =
+    ["dependencies", "dev-dependencies", "build-dependencies"];
 
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
@@ -125,25 +136,44 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
-    #[rustfmt::skip]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    #[cfg_attr(rustfmt, rustfmt_skip)] // Rust 1.30+ => #[rustfmt::skip]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::_DEFAULT_DEPENDENCIES as D;
-        match self {
+        match *self {
             NotFoundManifestDir => write!(f, "`CARGO_MANIFEST_DIR` environment variable not found"),
-            NotFoundManifestFile(path) => write!(f, "the manifest file not found: {}", path.display()),
-            Open(path, err) => write!(f, "an error occurred while to open {}: {}", path.display(), err),
-            Read(path, err) => write!(f, "an error occurred while reading {}: {}", path.display(), err),
-            Toml(err) => write!(f, "an error occurred while parsing the manifest file: {}", err),
-            NotFound(path) => write!(f, "the crate with the specified name not found in {}, {} or {} in {}", D[0], D[1], D[2], path.display()),
+            NotFoundManifestFile(ref path) => write!(f, "the manifest file not found: {}", path.display()),
+            Open(ref path, ref err) => write!(f, "an error occurred while to open {}: {}", path.display(), err),
+            Read(ref path, ref err) => write!(f, "an error occurred while reading {}: {}", path.display(), err),
+            Toml(ref err) => write!(f, "an error occurred while parsing the manifest file: {}", err),
+            NotFound(ref path) => write!(f, "the crate with the specified name not found in {}, {} or {} in {}", D[0], D[1], D[2], path.display()),
         }
     }
 }
 
 impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+    fn description(&self) -> &str {
+        match *self {
+            NotFoundManifestDir => "`CARGO_MANIFEST_DIR` environment variable not found",
+            NotFoundManifestFile(_) => "`Cargo.toml` or specified manifest file not found",
+            Open(_, _) => "An error occurred while to open the manifest file",
+            Read(_, _) => "An error occurred while reading the manifest file",
+            Toml(_) => "An error occurred while parsing the manifest file",
+            NotFound(_) => "The crate with the specified name not found",
+        }
+    }
+    #[cfg(stable_1_30)]
+    fn source(&self) -> Option<&(error::Error + 'static)> {
         match self {
             Open(_, err) | Read(_, err) => Some(err),
             Toml(err) => Some(err),
+            _ => None,
+        }
+    }
+    #[cfg(not(stable_1_30))] // https://github.com/rust-lang/rust/blob/1.30.0/src/libstd/error.rs#L143
+    fn cause(&self) -> Option<&error::Error> {
+        match *self {
+            Open(_, ref err) | Read(_, ref err) => Some(err),
+            Toml(ref err) => Some(err),
             _ => None,
         }
     }
@@ -193,7 +223,7 @@ struct FindOptions<'a> {
 
 impl<'a> Default for FindOptions<'a> {
     fn default() -> Self {
-        Self {
+        FindOptions {
             dependencies: DEFAULT_DEPENDENCIES,
             rust_ident: true,
         }
@@ -232,8 +262,8 @@ impl<'a> Package<'a> {
     /// Returns `true` if the value returned by `Package::name()` is a valid rust
     /// identifier.
     pub fn is_rust_ident(&self) -> bool {
-        match &self.rust_ident {
-            Cow::Borrowed(s) => !s.contains('-'),
+        match self.rust_ident {
+            Cow::Borrowed(ref s) => !s.contains('-'),
             Cow::Owned(_) => true,
         }
     }
@@ -292,8 +322,8 @@ impl<'a> Manifest<'a> {
 
     /// Constructs a new `Manifest` from the raw manifest.
     fn from_raw(manifest: Table) -> Self {
-        Self {
-            manifest,
+        Manifest {
+            manifest: manifest,
             options: FindOptions::default(),
         }
     }
@@ -324,7 +354,7 @@ impl<'a> Manifest<'a> {
 
     /// Lock the kinds of dependencies to be searched. This is more efficient when you want to
     /// search multiple times without changing the kinds of dependencies to be searched.
-    pub fn lock(&self) -> ManifestLock<'_> {
+    pub fn lock(&self) -> ManifestLock {
         ManifestLock::new(self)
     }
 
@@ -347,7 +377,7 @@ impl<'a> Manifest<'a> {
     ///     quote!(extern crate #name as #import_name;)
     /// }
     /// ```
-    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<'_, str>>
+    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<str>>
     where
         P: FnMut(&str) -> bool,
     {
@@ -373,16 +403,16 @@ impl<'a> Manifest<'a> {
     ///     quote!(extern crate #name as #import_name;)
     /// }
     /// ```
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package<'_>>
+    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
     where
         P: FnMut(&str) -> bool,
     {
-        self.dependencies()
-            .iter()
-            .find_map(|dependencies| self._find(dependencies, &mut predicate))
+        find_map(self.dependencies().iter(), |dependencies| {
+            self._find(dependencies, &mut predicate)
+        })
     }
 
-    fn _find<P>(&self, dependencies: &str, predicate: P) -> Option<Package<'_>>
+    fn _find<P>(&self, dependencies: &str, predicate: P) -> Option<Package>
     where
         P: FnMut(&str) -> bool,
     {
@@ -402,7 +432,7 @@ pub struct ManifestLock<'a> {
 
 impl<'a> ManifestLock<'a> {
     fn new(manifest: &'a Manifest<'a>) -> Self {
-        Self {
+        ManifestLock {
             tables: manifest
                 .dependencies()
                 .iter()
@@ -413,7 +443,7 @@ impl<'a> ManifestLock<'a> {
                         .and_then(|v| v.as_table())
                 })
                 .collect(),
-            manifest,
+            manifest: manifest,
         }
     }
 
@@ -449,7 +479,7 @@ impl<'a> ManifestLock<'a> {
     ///     tts
     /// }
     /// ```
-    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<'_, str>>
+    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<str>>
     where
         P: FnMut(&str) -> bool,
     {
@@ -488,14 +518,23 @@ impl<'a> ManifestLock<'a> {
     ///     tts
     /// }
     /// ```
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package<'_>>
+    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
     where
         P: FnMut(&str) -> bool,
     {
-        self.tables.iter().find_map(|dependencies| {
+        find_map(self.tables.iter(), |dependencies| {
             find_from_dependencies(dependencies, &mut predicate, self.manifest.rust_ident())
         })
     }
+}
+
+#[cfg(stable_1_30)]
+fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(mut iter: I, f: F) -> Option<B> {
+    iter.find_map(f)
+}
+#[cfg(not(stable_1_30))]
+fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(iter: I, f: F) -> Option<B> {
+    iter.filter_map(f).next()
 }
 
 fn manifest_path() -> Result<PathBuf> {
@@ -508,7 +547,7 @@ fn manifest_path() -> Result<PathBuf> {
         })
 }
 
-fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> Option<Package<'_>>
+fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> Option<Package>
 where
     P: FnMut(&str) -> bool,
 {
@@ -532,7 +571,7 @@ where
         })
     }
 
-    fn rust_ident(s: &str, convert: bool) -> Cow<'_, str> {
+    fn rust_ident(s: &str, convert: bool) -> Cow<str> {
         if convert {
             Cow::Owned(s.replace("-", "_"))
         } else {
@@ -540,19 +579,19 @@ where
         }
     }
 
-    table.iter().find_map(|(key, value)| {
+    find_map(table.iter(), |(key, value)| {
         if predicate(key) {
             Some(Package {
-                key,
+                key: key,
                 version: version(value),
                 package: None,
                 rust_ident: rust_ident(key, convert),
             })
         } else if let package @ Some(_) = package(value, &mut predicate) {
             Some(Package {
-                key,
+                key: key,
                 version: version(value),
-                package,
+                package: package,
                 rust_ident: rust_ident(key, convert),
             })
         } else {

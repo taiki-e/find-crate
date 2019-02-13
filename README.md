@@ -4,6 +4,7 @@
 [![version](https://img.shields.io/crates/v/find-crate.svg)](https://crates.io/crates/find-crate/)
 [![documentation](https://docs.rs/find-crate/badge.svg)](https://docs.rs/find-crate/)
 [![license](https://img.shields.io/crates/l/find-crate.svg)](https://crates.io/crates/find-crate/)
+[![Rustc Version](https://img.shields.io/badge/rustc-1.15+-lightgray.svg)](https://blog.rust-lang.org/2017/02/02/Rust-1.15.html)
 
 Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
 
@@ -26,7 +27,7 @@ Now, you can use find-crate:
 use find_crate::find_crate;
 ```
 
-The current version of find-crate requires Rust 1.30 or later.
+The current version of find-crate requires Rust 1.15 or later.
 
 ## Examples
 
