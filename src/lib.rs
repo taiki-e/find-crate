@@ -88,16 +88,13 @@ extern crate toml;
 use std::{
     borrow::Cow,
     collections::HashMap,
-    env,
-    error,
-    fmt,
     fs::File,
     io::{self, Read as _Read}, // Rust 1.33+ => Read as _
     path::{Path, PathBuf},
-    result,
+    {env, error, fmt, result},
 };
 
-use toml::{value::Table, Value};
+use toml::value::{Table, Value};
 
 use self::Error::*;
 
@@ -198,7 +195,7 @@ struct FindOptions<'a> {
 impl<'a> Default for FindOptions<'a> {
     fn default() -> Self {
         Self {
-            dependencies: &DEFAULT_DEPENDENCIES,
+            dependencies: DEFAULT_DEPENDENCIES,
             rust_ident: true,
         }
     }
