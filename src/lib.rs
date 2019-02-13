@@ -201,16 +201,20 @@ impl<'a> Default for FindOptions<'a> {
     }
 }
 
-/// The package data.
+/// The package data. This has information on the current package name,
+/// original package name, and specified version.
 #[derive(Debug, Clone)]
 pub struct Package<'a> {
     /// The key of this dependency in the manifest.
     key: &'a str,
-    /// The value of this dependency in the manifest.
-    value: &'a Value,
 
+    // value or version key's value
+    /// The specified version of the package.
+    version: Option<&'a str>,
+    // key or package key's value
     /// If this is `None`, the value of `key` field is the original name.
-    original: Option<&'a str>,
+    package: Option<&'a str>,
+
     /// If this is `Cow::Owned`, the value is a valid rust identifier.
     rust_ident: Cow<'a, str>,
 }
@@ -223,7 +227,7 @@ impl<'a> Package<'a> {
 
     /// Returns the original package name.
     pub fn original_name(&self) -> &str {
-        self.original.as_ref().unwrap_or(&self.key)
+        self.package.as_ref().unwrap_or(&self.key)
     }
 
     /// Returns `true` if the value returned by `Package::name()` is a valid rust
@@ -238,17 +242,12 @@ impl<'a> Package<'a> {
     /// Returns `true` if the value returned by `Package::name()` is the original
     /// package name.
     pub fn is_original(&self) -> bool {
-        self.original.is_none()
+        self.package.is_none()
     }
 
     /// Returns the version of the package.
     pub fn version(&self) -> Option<&str> {
-        self.value.as_str().or_else(|| {
-            self.value
-                .as_table()
-                .and_then(|t| t.get("version"))
-                .and_then(|v| v.as_str())
-        })
+        self.version.as_ref().map(|v| *v)
     }
 }
 
@@ -525,6 +524,15 @@ where
             .and_then(|s| if predicate(s) { Some(s) } else { None })
     }
 
+    fn version(value: &Value) -> Option<&str> {
+        value.as_str().or_else(|| {
+            value
+                .as_table()
+                .and_then(|t| t.get("version"))
+                .and_then(|v| v.as_str())
+        })
+    }
+
     fn rust_ident(s: &str, convert: bool) -> Cow<'_, str> {
         if convert {
             Cow::Owned(s.replace("-", "_"))
@@ -537,15 +545,15 @@ where
         if predicate(key) {
             Some(Package {
                 key,
-                value,
-                original: None,
+                version: version(value),
+                package: None,
                 rust_ident: rust_ident(key, convert),
             })
-        } else if let original @ Some(_) = package(value, &mut predicate) {
+        } else if let package @ Some(_) = package(value, &mut predicate) {
             Some(Package {
                 key,
-                value,
-                original,
+                version: version(value),
+                package,
                 rust_ident: rust_ident(key, convert),
             })
         } else {
