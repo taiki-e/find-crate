@@ -1,6 +1,6 @@
 # find-crate
 
-[![Build Status](https://travis-ci.org/taiki-e/find-crate.svg?branch=master)](https://travis-ci.org/taiki-e/find-crate)
+[![Build Status](https://travis-ci.com/taiki-e/find-crate.svg?branch=master)](https://travis-ci.com/taiki-e/find-crate)
 [![version](https://img.shields.io/crates/v/find-crate.svg)](https://crates.io/crates/find-crate/)
 [![documentation](https://docs.rs/find-crate/badge.svg)](https://docs.rs/find-crate/)
 [![license](https://img.shields.io/crates/l/find-crate.svg)](https://crates.io/crates/find-crate/)
