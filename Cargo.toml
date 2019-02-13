@@ -13,7 +13,8 @@ categories = ["development-tools::procedural-macro-helpers"]
 exclude = ["/.travis.yml"]
 
 [badges]
-travis-ci = { repository = "taiki-e/find-crate" }
+# https://github.com/rust-lang/crates.io/issues/1392
+# travis-ci = { repository = "taiki-e/find-crate" }
 
 [dependencies]
 toml = "0.4.2" # https://github.com/rust-lang/cargo/blob/master/Cargo.toml
