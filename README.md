@@ -8,7 +8,7 @@
 
 Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
 
-When writing declarative macros, `$crate` representing the current crate is very useful, but procedural macros do not have this. To do the same thing as `$crate` with procedural macros, you need to know the current name of the crate you want to use as `$crate`. This crate provides the features to make it easy.
+When writing declarative macros, `$crate` representing the current crate is very useful, but procedural macros do not have this. If you know the current name of the crate you want to use, you can do the same thing as `$crate`. This crate provides the features to make it easy.
 
 [Documentation](https://docs.rs/find-crate/)
 
@@ -41,6 +41,7 @@ use quote::quote;
 fn import() -> TokenStream {
     let name = find_crate(|s| s == "foo").unwrap();
     let name = Ident::new(&name, Span::call_site());
+    // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
 }
 ```
@@ -55,6 +56,7 @@ use quote::quote;
 fn import() -> TokenStream {
     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap();
     let name = Ident::new(&name, Span::call_site());
+    // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
 }
 ```
@@ -81,6 +83,7 @@ fn imports() -> TokenStream {
         let name = manifest.find_name(|s| names.iter().any(|x| s == *x)).unwrap();
         let name = Ident::new(&name, Span::call_site());
         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
+        // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
         tts.extend(quote!(extern crate #name as #import_name;));
     }
     tts

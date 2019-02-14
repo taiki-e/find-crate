@@ -1,5 +1,7 @@
 # Unreleased
 
+* Improve documentations
+
 # 0.2.0 - 2019-02-13
 
 * Support Rust 1.15

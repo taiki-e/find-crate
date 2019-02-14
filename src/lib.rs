@@ -1,10 +1,9 @@
 //! Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
 //!
 //! When writing declarative macros, `$crate` representing the current crate is
-//! very useful, but procedural macros do not have this. To do the same thing as
-//! `$crate` with procedural macros, you need to know the current name of the
-//! crate you want to use as `$crate`. This crate provides the features to make
-//! it easy.
+//! very useful, but procedural macros do not have this. If you know the current
+//! name of the crate you want to use, you can do the same thing as `$crate`.
+//! This crate provides the features to make it easy.
 //!
 //! ## Examples
 //!
@@ -21,6 +20,7 @@
 //! fn import() -> TokenStream {
 //!     let name = find_crate(|s| s == "foo").unwrap();
 //!     let name = Ident::new(&name, Span::call_site());
+//!     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
 //!     quote!(extern crate #name as _foo;)
 //! }
 //! ```
@@ -38,6 +38,7 @@
 //! fn import() -> TokenStream {
 //!     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap();
 //!     let name = Ident::new(&name, Span::call_site());
+//!     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
 //!     quote!(extern crate #name as _foo;)
 //! }
 //! ```
@@ -68,6 +69,7 @@
 //!         let name = manifest.find_name(|s| names.iter().any(|x| s == *x)).unwrap();
 //!         let name = Ident::new(&name, Span::call_site());
 //!         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
+//!         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
 //!         tts.extend(quote!(extern crate #name as #import_name;));
 //!     }
 //!     tts
@@ -200,10 +202,11 @@ impl error::Error for Error {
 /// use proc_macro2::{Ident, Span, TokenStream};
 /// use quote::quote;
 ///
-/// fn import(import_name: Ident) -> TokenStream {
+/// fn import() -> TokenStream {
 ///     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap();
 ///     let name = Ident::new(&name, Span::call_site());
-///     quote!(extern crate #name as #import_name;)
+///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
+///     quote!(extern crate #name as _foo;)
 /// }
 /// ```
 pub fn find_crate<P>(predicate: P) -> Result<String>
@@ -375,11 +378,12 @@ impl<'a> Manifest<'a> {
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
     ///
-    /// fn import(import_name: Ident) -> TokenStream {
+    /// fn import() -> TokenStream {
     ///     let manifest = Manifest::new().unwrap();
     ///     let name = manifest.find_name(|s| s == "foo" || s == "foo-core").unwrap();
     ///     let name = Ident::new(&name, Span::call_site());
-    ///     quote!(extern crate #name as #import_name;)
+    ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
+    ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
     pub fn find_name<P>(&self, predicate: P) -> Option<Cow<str>>
@@ -401,11 +405,12 @@ impl<'a> Manifest<'a> {
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
     ///
-    /// fn import(import_name: Ident) -> TokenStream {
+    /// fn import() -> TokenStream {
     ///     let manifest = Manifest::new().unwrap();
     ///     let package = manifest.find(|s| s == "foo" || s == "foo-core").unwrap();
     ///     let name = Ident::new(package.name(), Span::call_site());
-    ///     quote!(extern crate #name as #import_name;)
+    ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
+    ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
     pub fn find<P>(&self, mut predicate: P) -> Option<Package>
@@ -479,6 +484,7 @@ impl<'a> ManifestLock<'a> {
     ///         let name = manifest.find_name(|s| names.iter().any(|x| s == *x)).unwrap();
     ///         let name = Ident::new(&name, Span::call_site());
     ///         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
+    ///         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
     ///         tts.extend(quote!(extern crate #name as #import_name;));
     ///     }
     ///     tts
@@ -518,6 +524,7 @@ impl<'a> ManifestLock<'a> {
     ///         let package = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap();
     ///         let name = Ident::new(package.name(), Span::call_site());
     ///         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
+    ///         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
     ///         tts.extend(quote!(extern crate #name as #import_name;));
     ///     }
     ///     tts
