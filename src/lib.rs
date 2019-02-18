@@ -82,7 +82,9 @@
 //! [`find_crate()`]: fn.find_crate.html
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.2.0")]
-#![deny(missing_docs, missing_debug_implementations, unsafe_code)]
+#![deny(missing_docs, missing_debug_implementations)]
+#![deny(unsafe_code)]
+#![deny(unreachable_pub)]
 #![cfg_attr(
     feature = "cargo-clippy",
     allow(
