@@ -417,7 +417,7 @@ impl<'a> Manifest<'a> {
     {
         self.manifest
             .get(dependencies)
-            .and_then(|v| v.as_table())
+            .and_then(Value::as_table)
             .and_then(|t| find_from_dependencies(t, predicate, self.rust_ident()))
     }
 }
@@ -439,7 +439,7 @@ impl<'a> ManifestLock<'a> {
                     manifest
                         .manifest
                         .get(dependencies)
-                        .and_then(|v| v.as_table())
+                        .and_then(Value::as_table)
                 })
                 .collect(),
             manifest: manifest,
@@ -554,7 +554,7 @@ where
         value
             .as_table()
             .and_then(|t| t.get("package"))
-            .and_then(|v| v.as_str())
+            .and_then(Value::as_str)
             .and_then(|s| if predicate(s) { Some(s) } else { None })
     }
 
@@ -563,7 +563,7 @@ where
             value
                 .as_table()
                 .and_then(|t| t.get("version"))
-                .and_then(|v| v.as_str())
+                .and_then(Value::as_str)
         })
     }
 
