@@ -165,20 +165,7 @@ impl error::Error for Error {
             NotFound(_) => "The crate with the specified name not found",
         }
     }
-    #[cfg(stable_1_30)]
-    fn source(&self) -> Option<&(error::Error + 'static)> {
-        match self {
-            Open(_, err) | Read(_, err) => Some(err),
-            Toml(err) => Some(err),
-            _ => None,
-        }
-    }
-    #[cfg(stable_1_30)] // https://github.com/rust-lang/rust/blob/1.30.0/src/libstd/error.rs#L143
     #[allow(deprecated)]
-    fn cause(&self) -> Option<&error::Error> {
-        self.source()
-    }
-    #[cfg(not(stable_1_30))]
     fn cause(&self) -> Option<&error::Error> {
         match *self {
             Open(_, ref err) | Read(_, ref err) => Some(err),
@@ -542,11 +529,6 @@ impl<'a> ManifestLock<'a> {
     }
 }
 
-#[cfg(stable_1_30)]
-fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(mut iter: I, f: F) -> Option<B> {
-    iter.find_map(f)
-}
-#[cfg(not(stable_1_30))]
 fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(iter: I, f: F) -> Option<B> {
     iter.filter_map(f).next()
 }

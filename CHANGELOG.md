@@ -1,5 +1,7 @@
 # Unreleased
 
+* Remove version dependent behavior
+
 * Improve documentations
 
 # 0.2.0 - 2019-02-13
