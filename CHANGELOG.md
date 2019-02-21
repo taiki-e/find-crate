@@ -1,12 +1,14 @@
 # Unreleased
 
-* Remove version dependent behavior
+# 0.3.0 - 2019-02-21
 
-* Improve documentations
+* Remove version dependent behavior.
+
+* Improve documentations.
 
 # 0.2.0 - 2019-02-13
 
-* Support Rust 1.15
+* Support Rust 1.15.
 
 # 0.1.2 - 2019-02-13
 
