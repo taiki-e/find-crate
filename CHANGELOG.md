@@ -2,21 +2,21 @@
 
 # 0.3.0 - 2019-02-21
 
-* Remove version dependent behavior.
+* Removed version dependent behavior.
 
-* Improve documentations.
+* Improved documentation.
 
 # 0.2.0 - 2019-02-13
 
-* Support Rust 1.15.
+* Supported Rust 1.15.
 
 # 0.1.2 - 2019-02-13
 
-* Implement `PartialEq` and `Eq` for `Package`.
+* Implemented `PartialEq` and `Eq` for `Package`.
 
 # 0.1.1 - 2019-02-13
 
-* Improve documentations.
+* Improved documentation.
 
 # 0.1.0 - 2019-02-13
 
