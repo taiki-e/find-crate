@@ -109,7 +109,7 @@ use std::result;
 
 use toml::value::{Table, Value};
 
-use self::Error::*;
+use self::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile, Open, Read, Toml};
 
 type Result<T> = result::Result<T, Error>;
 
@@ -119,6 +119,9 @@ pub const DEFAULT_DEPENDENCIES: &'static [&'static str] = &_DEFAULT_DEPENDENCIES
 // for const_err
 const _DEFAULT_DEPENDENCIES: [&'static str; 3] =
     ["dependencies", "dev-dependencies", "build-dependencies"];
+
+/// `CARGO_MANIFEST_DIR` environment variable.
+const MANIFEST_DIR: &'static str = "CARGO_MANIFEST_DIR";
 
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
@@ -144,7 +147,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::_DEFAULT_DEPENDENCIES as D;
         match *self {
-            NotFoundManifestDir => write!(f, "`CARGO_MANIFEST_DIR` environment variable not found"),
+            NotFoundManifestDir => write!(f, "`{}` environment variable not found", MANIFEST_DIR),
             NotFoundManifestFile(ref path) => write!(f, "the manifest file not found: {}", path.display()),
             Open(ref path, ref err) => write!(f, "an error occurred while to open {}: {}", path.display(), err),
             Read(ref path, ref err) => write!(f, "an error occurred while reading {}: {}", path.display(), err),
@@ -165,6 +168,7 @@ impl error::Error for Error {
             NotFound(_) => "The crate with the specified name not found",
         }
     }
+
     #[allow(deprecated)]
     fn cause(&self) -> Option<&error::Error> {
         match *self {
@@ -209,10 +213,11 @@ where
         .ok_or_else(|| NotFound(manifest_path))
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct FindOptions<'a> {
     /// The names of the tables to be searched
     dependencies: &'a [&'a str],
+
     /// Whether or not to convert the name of the retrieved crate to a valid
     /// rust identifier
     rust_ident: bool,
@@ -237,6 +242,7 @@ pub struct Package<'a> {
     // value or version key's value
     /// The specified version of the package.
     version: Option<&'a str>,
+
     // key or package key's value
     /// If this is `None`, the value of `key` field is the original name.
     package: Option<&'a str>,
@@ -305,10 +311,10 @@ impl<'a> Manifest<'a> {
                 .map(|_| bytes)
         }
 
-        if !manifest_path.is_file() {
-            Err(NotFoundManifestFile(manifest_path.to_owned()))
-        } else {
+        if manifest_path.is_file() {
             Self::from_bytes(&open(&manifest_path)?)
+        } else {
+            Err(NotFoundManifestFile(manifest_path.to_owned()))
         }
     }
 
@@ -534,7 +540,7 @@ fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(iter: I, f: F) -> Op
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os("CARGO_MANIFEST_DIR")
+    env::var_os(MANIFEST_DIR)
         .ok_or_else(|| NotFoundManifestDir)
         .map(PathBuf::from)
         .map(|mut manifest_path| {
@@ -547,9 +553,9 @@ fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> 
 where
     P: FnMut(&str) -> bool,
 {
-    fn package<P>(value: &Value, mut predicate: P) -> Option<&str>
+    fn package<P>(value: &Value, predicate: P) -> Option<&str>
     where
-        P: FnMut(&str) -> bool,
+        P: FnOnce(&str) -> bool,
     {
         value
             .as_table()
