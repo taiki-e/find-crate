@@ -1,5 +1,7 @@
 # Unreleased
 
+* Updated minimum `toml` version to 0.5.0.
+
 # 0.3.0 - 2019-02-21
 
 * Removed version dependent behavior.

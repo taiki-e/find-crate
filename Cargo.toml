@@ -17,7 +17,7 @@ exclude = ["/.travis.yml"]
 # travis-ci = { repository = "taiki-e/find-crate" }
 
 [dependencies]
-toml = "0.4.2" # https://github.com/rust-lang/cargo/blob/master/Cargo.toml
+toml = "0.5.0" # https://github.com/rust-lang/cargo/blob/master/Cargo.toml
 
 [dev-dependencies]
 proc-macro2 = "0.4.13"
