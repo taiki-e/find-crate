@@ -225,10 +225,7 @@ struct FindOptions<'a> {
 
 impl<'a> Default for FindOptions<'a> {
     fn default() -> Self {
-        FindOptions {
-            dependencies: DEFAULT_DEPENDENCIES,
-            rust_ident: true,
-        }
+        FindOptions { dependencies: DEFAULT_DEPENDENCIES, rust_ident: true }
     }
 }
 
@@ -325,10 +322,7 @@ impl<'a> Manifest<'a> {
 
     /// Constructs a new `Manifest` from the raw manifest.
     fn from_raw(manifest: Table) -> Self {
-        Manifest {
-            manifest: manifest,
-            options: FindOptions::default(),
-        }
+        Manifest { manifest: manifest, options: FindOptions::default() }
     }
 
     /// Returns the kinds of dependencies to be searched. The default is
@@ -442,10 +436,7 @@ impl<'a> ManifestLock<'a> {
                 .dependencies()
                 .iter()
                 .filter_map(|&dependencies| {
-                    manifest
-                        .manifest
-                        .get(dependencies)
-                        .and_then(Value::as_table)
+                    manifest.manifest.get(dependencies).and_then(Value::as_table)
                 })
                 .collect(),
             manifest: manifest,
@@ -540,13 +531,12 @@ fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(iter: I, f: F) -> Op
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR)
-        .ok_or_else(|| NotFoundManifestDir)
-        .map(PathBuf::from)
-        .map(|mut manifest_path| {
+    env::var_os(MANIFEST_DIR).ok_or_else(|| NotFoundManifestDir).map(PathBuf::from).map(
+        |mut manifest_path| {
             manifest_path.push("Cargo.toml");
             manifest_path
-        })
+        },
+    )
 }
 
 fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> Option<Package>
@@ -557,20 +547,19 @@ where
     where
         P: FnOnce(&str) -> bool,
     {
-        value
-            .as_table()
-            .and_then(|t| t.get("package"))
-            .and_then(Value::as_str)
-            .and_then(|s| if predicate(s) { Some(s) } else { None })
+        value.as_table().and_then(|t| t.get("package")).and_then(Value::as_str).and_then(|s| {
+            if predicate(s) {
+                Some(s)
+            } else {
+                None
+            }
+        })
     }
 
     fn version(value: &Value) -> Option<&str> {
-        value.as_str().or_else(|| {
-            value
-                .as_table()
-                .and_then(|t| t.get("version"))
-                .and_then(Value::as_str)
-        })
+        value
+            .as_str()
+            .or_else(|| value.as_table().and_then(|t| t.get("version")).and_then(Value::as_str))
     }
 
     fn rust_ident(s: &str, convert: bool) -> Cow<str> {
