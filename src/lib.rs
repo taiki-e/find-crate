@@ -76,10 +76,11 @@
 #![deny(missing_docs, missing_debug_implementations)]
 #![deny(unsafe_code)]
 #![deny(unreachable_pub)]
+#![cfg_attr(feature = "cargo-clippy", allow(renamed_and_removed_lints))]
+#![cfg_attr(feature = "cargo-clippy", deny(clippy, clippy_pedantic))]
 #![cfg_attr(
     feature = "cargo-clippy",
     allow(
-        renamed_and_removed_lints,
         redundant_field_names, // Rust 1.17+ => remove
         const_static_lifetime, // Rust 1.17+ => remove
         deprecated_cfg_attr, // Rust 1.30+ => remove
