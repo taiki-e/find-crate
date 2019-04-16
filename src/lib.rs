@@ -9,10 +9,7 @@
 //!
 //! [`find_crate()`] gets the crate name from `Cargo.toml`.
 //!
-//! ```rust
-//! # extern crate find_crate;
-//! # extern crate proc_macro2;
-//! # extern crate quote;
+//! ```rust,edition2018
 //! use find_crate::find_crate;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
@@ -27,10 +24,7 @@
 //!
 //! As in this example, it is easy to handle cases where proc-macro is exported from multiple crates.
 //!
-//! ```rust
-//! # extern crate find_crate;
-//! # extern crate proc_macro2;
-//! # extern crate quote;
+//! ```rust,edition2018
 //! use find_crate::find_crate;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
@@ -46,10 +40,7 @@
 //! Search for multiple crates. It is much more efficient than using
 //! [`find_crate()`] for each crate.
 //!
-//! ```rust
-//! # extern crate find_crate;
-//! # extern crate proc_macro2;
-//! # extern crate quote;
+//! ```rust,edition2018
 //! use find_crate::Manifest;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
