@@ -73,6 +73,7 @@
 //! [`find_crate()`]: fn.find_crate.html
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.3.0")]
+#![doc(test(attr(deny(warnings), allow(dead_code, unused_assignments, unused_variables))))]
 #![warn(missing_docs, missing_debug_implementations)]
 #![warn(unsafe_code)]
 #![warn(unreachable_pub)]
