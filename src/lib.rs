@@ -73,17 +73,18 @@
 //! [`find_crate()`]: fn.find_crate.html
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.3.0")]
-#![deny(missing_docs, missing_debug_implementations)]
-#![deny(unsafe_code)]
-#![deny(unreachable_pub)]
+#![warn(missing_docs, missing_debug_implementations)]
+#![warn(unsafe_code)]
+#![warn(unreachable_pub)]
 #![cfg_attr(feature = "cargo-clippy", allow(renamed_and_removed_lints))]
-#![cfg_attr(feature = "cargo-clippy", deny(clippy, clippy_pedantic))]
+#![cfg_attr(feature = "cargo-clippy", warn(clippy, clippy_pedantic))]
 #![cfg_attr(
     feature = "cargo-clippy",
     allow(
         redundant_field_names, // Rust 1.17+ => remove
         const_static_lifetime, // Rust 1.17+ => remove
         deprecated_cfg_attr, // Rust 1.30+ => remove
+        filter_map_next, // Rust 1.30+ => remove
         map_clone
     )
 )]
@@ -161,6 +162,7 @@ impl error::Error for Error {
         }
     }
 
+    #[allow(bare_trait_objects)] // Rust 1.27+ => &dyn error::Error
     #[allow(deprecated)]
     fn cause(&self) -> Option<&error::Error> {
         match *self {
