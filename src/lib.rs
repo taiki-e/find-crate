@@ -9,7 +9,7 @@
 //!
 //! [`find_crate()`] gets the crate name from `Cargo.toml`.
 //!
-//! ```rust,edition2018
+//! ```rust
 //! use find_crate::find_crate;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
@@ -24,7 +24,7 @@
 //!
 //! As in this example, it is easy to handle cases where proc-macro is exported from multiple crates.
 //!
-//! ```rust,edition2018
+//! ```rust
 //! use find_crate::find_crate;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
@@ -40,7 +40,7 @@
 //! Search for multiple crates. It is much more efficient than using
 //! [`find_crate()`] for each crate.
 //!
-//! ```rust,edition2018
+//! ```rust
 //! use find_crate::Manifest;
 //! use proc_macro2::{Ident, Span, TokenStream};
 //! use quote::quote;
@@ -68,38 +68,30 @@
 //! ```
 //!
 //! By default it will be searched from `dependencies`, `dev-dependencies` and `build-dependencies`.
-//! Also, `find_crate()` and `Manifest::new()` read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
-//!
-//! [`find_crate()`]: fn.find_crate.html
+//! Also, [`find_crate()`] and [`Manifest::new()`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.3.0")]
 #![doc(test(attr(deny(warnings), allow(dead_code, unused_assignments, unused_variables))))]
 #![warn(missing_docs, missing_debug_implementations)]
 #![warn(unsafe_code)]
-#![warn(unreachable_pub)]
-#![cfg_attr(feature = "cargo-clippy", allow(renamed_and_removed_lints))]
-#![cfg_attr(feature = "cargo-clippy", warn(clippy, clippy_pedantic))]
-#![cfg_attr(
-    feature = "cargo-clippy",
-    allow(
-        redundant_field_names, // Rust 1.17+ => remove
-        const_static_lifetime, // Rust 1.17+ => remove
-        deprecated_cfg_attr, // Rust 1.30+ => remove
-        filter_map_next, // Rust 1.30+ => remove
-        map_clone
-    )
-)]
+#![warn(rust_2018_idioms, unreachable_pub)]
+// It cannot be included in the published code because these lints have false positives in the minimum required version.
+#![cfg_attr(test, warn(single_use_lifetimes))]
+#![warn(clippy::all, clippy::pedantic)]
+#![warn(clippy::nursery)]
+#![allow(clippy::missing_const_for_fn)]
 
-extern crate toml;
-
-use std::borrow::Cow;
-use std::env;
-use std::error;
-use std::fmt;
-use std::fs::File;
-use std::io::{self, Read as _Read}; // Rust 1.33+ => Read as _
-use std::path::{Path, PathBuf};
-use std::result;
+use std::{
+    borrow::Cow,
+    env,
+    error,
+    fmt,
+    fs::File,
+    io::{self, Read as _Read}, // Rust 1.33+ => Read as _
+    ops::Deref,
+    path::{Path, PathBuf},
+    result,
+};
 
 use toml::value::{Table, Value};
 
@@ -108,14 +100,13 @@ use self::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile, Open, Rea
 type Result<T> = result::Result<T, Error>;
 
 /// The kinds of dependencies searched by default.
-pub const DEFAULT_DEPENDENCIES: &'static [&'static str] = &_DEFAULT_DEPENDENCIES;
+pub const DEFAULT_DEPENDENCIES: &[&str] = &_DEFAULT_DEPENDENCIES;
 
 // for const_err
-const _DEFAULT_DEPENDENCIES: [&'static str; 3] =
-    ["dependencies", "dev-dependencies", "build-dependencies"];
+const _DEFAULT_DEPENDENCIES: [&str; 3] = ["dependencies", "dev-dependencies", "build-dependencies"];
 
 /// `CARGO_MANIFEST_DIR` environment variable.
-const MANIFEST_DIR: &'static str = "CARGO_MANIFEST_DIR";
+const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
@@ -137,38 +128,25 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
-    #[cfg_attr(rustfmt, rustfmt_skip)] // Rust 1.30+ => #[rustfmt::skip]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    #[rustfmt::skip]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use self::_DEFAULT_DEPENDENCIES as D;
-        match *self {
+        match self {
             NotFoundManifestDir => write!(f, "`{}` environment variable not found", MANIFEST_DIR),
-            NotFoundManifestFile(ref path) => write!(f, "the manifest file not found: {}", path.display()),
-            Open(ref path, ref err) => write!(f, "an error occurred while to open {}: {}", path.display(), err),
-            Read(ref path, ref err) => write!(f, "an error occurred while reading {}: {}", path.display(), err),
-            Toml(ref err) => write!(f, "an error occurred while parsing the manifest file: {}", err),
-            NotFound(ref path) => write!(f, "the crate with the specified name not found in {}, {} or {} in {}", D[0], D[1], D[2], path.display()),
+            NotFoundManifestFile(path) => write!(f, "the manifest file not found: {}", path.display()),
+            Open(path, err) => write!(f, "an error occurred while to open {}: {}", path.display(), err),
+            Read(path, err) => write!(f, "an error occurred while reading {}: {}", path.display(), err),
+            Toml(err) => write!(f, "an error occurred while parsing the manifest file: {}", err),
+            NotFound(path) => write!(f, "the crate with the specified name not found in {}, {} or {} in {}", D[0], D[1], D[2], path.display()),
         }
     }
 }
 
 impl error::Error for Error {
-    fn description(&self) -> &str {
-        match *self {
-            NotFoundManifestDir => "`CARGO_MANIFEST_DIR` environment variable not found",
-            NotFoundManifestFile(_) => "`Cargo.toml` or specified manifest file not found",
-            Open(_, _) => "An error occurred while to open the manifest file",
-            Read(_, _) => "An error occurred while reading the manifest file",
-            Toml(_) => "An error occurred while parsing the manifest file",
-            NotFound(_) => "The crate with the specified name not found",
-        }
-    }
-
-    #[allow(bare_trait_objects)] // Rust 1.27+ => &dyn error::Error
-    #[allow(deprecated)]
-    fn cause(&self) -> Option<&error::Error> {
-        match *self {
-            Open(_, ref err) | Read(_, ref err) => Some(err),
-            Toml(ref err) => Some(err),
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            Open(_, err) | Read(_, err) => Some(err),
+            Toml(err) => Some(err),
             _ => None,
         }
     }
@@ -183,9 +161,6 @@ impl error::Error for Error {
 /// ## Examples
 ///
 /// ```rust
-/// # extern crate find_crate;
-/// # extern crate proc_macro2;
-/// # extern crate quote;
 /// use find_crate::find_crate;
 /// use proc_macro2::{Ident, Span, TokenStream};
 /// use quote::quote;
@@ -218,9 +193,9 @@ struct FindOptions<'a> {
     rust_ident: bool,
 }
 
-impl<'a> Default for FindOptions<'a> {
+impl Default for FindOptions<'_> {
     fn default() -> Self {
-        FindOptions { dependencies: DEFAULT_DEPENDENCIES, rust_ident: true }
+        Self { dependencies: DEFAULT_DEPENDENCIES, rust_ident: true }
     }
 }
 
@@ -243,7 +218,7 @@ pub struct Package<'a> {
     rust_ident: Cow<'a, str>,
 }
 
-impl<'a> Package<'a> {
+impl Package<'_> {
     /// Returns the current package name.
     pub fn name(&self) -> &str {
         &self.rust_ident
@@ -257,8 +232,8 @@ impl<'a> Package<'a> {
     /// Returns `true` if the value returned by `Package::name()` is a valid rust
     /// identifier.
     pub fn is_rust_ident(&self) -> bool {
-        match self.rust_ident {
-            Cow::Borrowed(ref s) => !s.contains('-'),
+        match &self.rust_ident {
+            Cow::Borrowed(s) => !s.contains('-'),
             Cow::Owned(_) => true,
         }
     }
@@ -271,7 +246,7 @@ impl<'a> Package<'a> {
 
     /// Returns the version of the package.
     pub fn version(&self) -> Option<&str> {
-        self.version.as_ref().map(|v| *v)
+        self.version.as_ref().map(Deref::deref)
     }
 }
 
@@ -304,7 +279,7 @@ impl<'a> Manifest<'a> {
         }
 
         if manifest_path.is_file() {
-            Self::from_bytes(&open(&manifest_path)?)
+            Self::from_bytes(&open(manifest_path)?)
         } else {
             Err(NotFoundManifestFile(manifest_path.to_owned()))
         }
@@ -317,7 +292,7 @@ impl<'a> Manifest<'a> {
 
     /// Constructs a new `Manifest` from the raw manifest.
     fn from_raw(manifest: Table) -> Self {
-        Manifest { manifest: manifest, options: FindOptions::default() }
+        Manifest { manifest, options: FindOptions::default() }
     }
 
     /// Returns the kinds of dependencies to be searched. The default is
@@ -346,7 +321,7 @@ impl<'a> Manifest<'a> {
 
     /// Lock the kinds of dependencies to be searched. This is more efficient when you want to
     /// search multiple times without changing the kinds of dependencies to be searched.
-    pub fn lock(&self) -> ManifestLock {
+    pub fn lock(&self) -> ManifestLock<'_> {
         ManifestLock::new(self)
     }
 
@@ -355,9 +330,6 @@ impl<'a> Manifest<'a> {
     /// ## Examples
     ///
     /// ```rust
-    /// # extern crate find_crate;
-    /// # extern crate proc_macro2;
-    /// # extern crate quote;
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
@@ -370,7 +342,7 @@ impl<'a> Manifest<'a> {
     ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
-    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<str>>
+    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<'_, str>>
     where
         P: FnMut(&str) -> bool,
     {
@@ -382,9 +354,6 @@ impl<'a> Manifest<'a> {
     /// ## Examples
     ///
     /// ```rust
-    /// # extern crate find_crate;
-    /// # extern crate proc_macro2;
-    /// # extern crate quote;
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
@@ -397,23 +366,16 @@ impl<'a> Manifest<'a> {
     ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
+    pub fn find<P>(&self, mut predicate: P) -> Option<Package<'_>>
     where
         P: FnMut(&str) -> bool,
     {
-        find_map(self.dependencies().iter(), |dependencies| {
-            self._find(dependencies, &mut predicate)
+        self.dependencies().iter().find_map(|dependencies| {
+            self.manifest
+                .get(*dependencies)
+                .and_then(Value::as_table)
+                .and_then(|t| find_from_dependencies(t, &mut predicate, self.rust_ident()))
         })
-    }
-
-    fn _find<P>(&self, dependencies: &str, predicate: P) -> Option<Package>
-    where
-        P: FnMut(&str) -> bool,
-    {
-        self.manifest
-            .get(dependencies)
-            .and_then(Value::as_table)
-            .and_then(|t| find_from_dependencies(t, predicate, self.rust_ident()))
     }
 }
 
@@ -426,7 +388,7 @@ pub struct ManifestLock<'a> {
 
 impl<'a> ManifestLock<'a> {
     fn new(manifest: &'a Manifest<'a>) -> Self {
-        ManifestLock {
+        Self {
             tables: manifest
                 .dependencies()
                 .iter()
@@ -434,7 +396,7 @@ impl<'a> ManifestLock<'a> {
                     manifest.manifest.get(dependencies).and_then(Value::as_table)
                 })
                 .collect(),
-            manifest: manifest,
+            manifest,
         }
     }
 
@@ -443,9 +405,6 @@ impl<'a> ManifestLock<'a> {
     /// ## Examples
     ///
     /// ```rust
-    /// # extern crate find_crate;
-    /// # extern crate proc_macro2;
-    /// # extern crate quote;
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
@@ -471,7 +430,7 @@ impl<'a> ManifestLock<'a> {
     ///     tts
     /// }
     /// ```
-    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<str>>
+    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<'_, str>>
     where
         P: FnMut(&str) -> bool,
     {
@@ -483,9 +442,6 @@ impl<'a> ManifestLock<'a> {
     /// ## Examples
     ///
     /// ```rust
-    /// # extern crate find_crate;
-    /// # extern crate proc_macro2;
-    /// # extern crate quote;
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
@@ -511,22 +467,18 @@ impl<'a> ManifestLock<'a> {
     ///     tts
     /// }
     /// ```
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
+    pub fn find<P>(&self, mut predicate: P) -> Option<Package<'_>>
     where
         P: FnMut(&str) -> bool,
     {
-        find_map(self.tables.iter(), |dependencies| {
+        self.tables.iter().find_map(|dependencies| {
             find_from_dependencies(dependencies, &mut predicate, self.manifest.rust_ident())
         })
     }
 }
 
-fn find_map<I: Iterator, B, F: FnMut(I::Item) -> Option<B>>(iter: I, f: F) -> Option<B> {
-    iter.filter_map(f).next()
-}
-
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR).ok_or_else(|| NotFoundManifestDir).map(PathBuf::from).map(
+    env::var_os(MANIFEST_DIR).ok_or(NotFoundManifestDir).map(PathBuf::from).map(
         |mut manifest_path| {
             manifest_path.push("Cargo.toml");
             manifest_path
@@ -534,7 +486,7 @@ fn manifest_path() -> Result<PathBuf> {
     )
 }
 
-fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> Option<Package>
+fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> Option<Package<'_>>
 where
     P: FnMut(&str) -> bool,
 {
@@ -557,7 +509,7 @@ where
             .or_else(|| value.as_table().and_then(|t| t.get("version")).and_then(Value::as_str))
     }
 
-    fn rust_ident(s: &str, convert: bool) -> Cow<str> {
+    fn rust_ident(s: &str, convert: bool) -> Cow<'_, str> {
         if convert {
             Cow::Owned(s.replace("-", "_"))
         } else {
@@ -565,23 +517,21 @@ where
         }
     }
 
-    find_map(table.iter(), |(key, value)| {
+    table.iter().find_map(|(key, value)| {
         if predicate(key) {
             Some(Package {
-                key: key,
+                key,
                 version: version(value),
                 package: None,
                 rust_ident: rust_ident(key, convert),
             })
-        } else if let package @ Some(_) = package(value, &mut predicate) {
-            Some(Package {
-                key: key,
+        } else {
+            package(value, &mut predicate).map(|package| Package {
+                key,
                 version: version(value),
-                package: package,
+                package: Some(package),
                 rust_ident: rust_ident(key, convert),
             })
-        } else {
-            None
         }
     })
 }
