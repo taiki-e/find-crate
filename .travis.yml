@@ -14,9 +14,9 @@ matrix:
   include:
     # This is the minimum Rust version supported by find-crate.
     # When updating this, the reminder to update the minimum required version in README.md.
-    - rust: 1.15.1 # https://github.com/dtolnay/syn/blob/master/.travis.yml
-      script:
-        - cargo build
+    # - rust: 1.15.1 # https://github.com/dtolnay/syn/blob/master/.travis.yml
+    #   script:
+    #     - cargo build
 
     - rust: stable
     - rust: beta
