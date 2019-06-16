@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.4.0 - 2019-06-16
+
 * Transition to Rust 2018. With this change, the minimum required version will go up to Rust 1.31.
 
 * Updated minimum `toml` version to 0.5.0.

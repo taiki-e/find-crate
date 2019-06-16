@@ -4,7 +4,7 @@
 [![version](https://img.shields.io/crates/v/find-crate.svg)](https://crates.io/crates/find-crate/)
 [![documentation](https://docs.rs/find-crate/badge.svg)](https://docs.rs/find-crate/)
 [![license](https://img.shields.io/crates/l/find-crate.svg)](https://crates.io/crates/find-crate/)
-[![Rustc Version](https://img.shields.io/badge/rustc-1.15+-lightgray.svg)](https://blog.rust-lang.org/2017/02/02/Rust-1.15.html)
+[![Rustc Version](https://img.shields.io/badge/rustc-1.31+-lightgray.svg)](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html)
 
 Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
 
@@ -18,7 +18,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-find-crate = "0.3"
+find-crate = "0.4"
 ```
 
 Now, you can use find-crate:
