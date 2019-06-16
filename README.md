@@ -27,7 +27,7 @@ Now, you can use find-crate:
 use find_crate::find_crate;
 ```
 
-The current version of find-crate requires Rust 1.15 or later.
+The current version of find-crate requires Rust 1.31 or later.
 
 ## Examples
 

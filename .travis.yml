@@ -14,9 +14,7 @@ matrix:
   include:
     # This is the minimum Rust version supported by find-crate.
     # When updating this, the reminder to update the minimum required version in README.md.
-    # - rust: 1.15.1 # https://github.com/dtolnay/syn/blob/master/.travis.yml
-    #   script:
-    #     - cargo build
+    - rust: 1.31.0
 
     - rust: stable
     - rust: beta
@@ -34,7 +32,7 @@ matrix:
       name: cargo clippy
       script:
         - rustup component add clippy || travis_terminate 0
-        - cargo clippy --all --all-features
+        - cargo clippy --tests
 
     - rust: stable
       name: cargo fmt
@@ -44,8 +42,10 @@ matrix:
 
     - rust: nightly
       name: cargo doc
+      env:
+        - RUSTDOCFLAGS=-Dwarnings
       script:
-        - RUSTDOCFLAGS=-Dwarnings cargo doc --no-deps
+        - cargo doc --no-deps
 
 env:
   - RUSTFLAGS="-D warnings"
@@ -54,7 +54,7 @@ before_script:
   - set -o errexit
 
 script:
-  - cargo test --tests
+  - cargo check
 
 notifications:
   email:
