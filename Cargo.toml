@@ -11,11 +11,6 @@ documentation = "https://docs.rs/find-crate/"
 readme = "README.md"
 keywords = ["macros", "crate"]
 categories = ["development-tools::procedural-macro-helpers"]
-exclude = ["/.travis.yml", "/bors.toml"]
-
-[badges]
-# https://github.com/rust-lang/crates.io/issues/1392
-# travis-ci = { repository = "taiki-e/find-crate" }
 
 [dependencies]
 serde = ">=1.0.7, <2"

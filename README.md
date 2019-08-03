@@ -1,10 +1,21 @@
 # find-crate
 
-[![Build Status](https://travis-ci.com/taiki-e/find-crate.svg?branch=master)](https://travis-ci.com/taiki-e/find-crate)
-[![version](https://img.shields.io/crates/v/find-crate.svg)](https://crates.io/crates/find-crate/)
-[![documentation](https://docs.rs/find-crate/badge.svg)](https://docs.rs/find-crate/)
-[![license](https://img.shields.io/crates/l/find-crate.svg)](https://crates.io/crates/find-crate/)
-[![Rustc Version](https://img.shields.io/badge/rustc-1.31+-lightgray.svg)](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html)
+[![Build Status][azure-badge]][azure-url]
+[![Crates.io][crates-version-badge]][crates-url]
+[![Docs.rs][docs-badge]][docs-url]
+[![License][crates-license-badge]][crates-url]
+[![Minimum supported Rust version][rustc-badge]][rustc-url]
+
+[azure-badge]: https://dev.azure.com/taiki-e/taiki-e/_apis/build/status/taiki-e.find-crate?branchName=master
+[azure-url]: https://dev.azure.com/taiki-e/taiki-e/_build/latest?definitionId=10&branchName=master
+[crates-version-badge]: https://img.shields.io/crates/v/find-crate.svg
+[crates-license-badge]: https://img.shields.io/crates/l/find-crate.svg
+[crates-badge]: https://img.shields.io/crates/v/find-crate.svg
+[crates-url]: https://crates.io/crates/find-crate/
+[docs-badge]: https://docs.rs/find-crate/badge.svg
+[docs-url]: https://docs.rs/find-crate/
+[rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
+[rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
 
 Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
 
@@ -21,13 +32,7 @@ Add this to your `Cargo.toml`:
 find-crate = "0.4"
 ```
 
-Now, you can use find-crate:
-
-```rust
-use find_crate::find_crate;
-```
-
-The current version of find-crate requires Rust 1.31 or later.
+The current find-crate requires Rust 1.31 or later.
 
 ## Examples
 
