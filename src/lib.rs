@@ -492,13 +492,11 @@ where
     where
         P: FnOnce(&str) -> bool,
     {
-        value.as_table().and_then(|t| t.get("package")).and_then(Value::as_str).and_then(|s| {
-            if predicate(s) {
-                Some(s)
-            } else {
-                None
-            }
-        })
+        value
+            .as_table()
+            .and_then(|t| t.get("package"))
+            .and_then(Value::as_str)
+            .and_then(|s| if predicate(s) { Some(s) } else { None })
     }
 
     fn version(value: &Value) -> Option<&str> {
@@ -508,11 +506,7 @@ where
     }
 
     fn rust_ident(s: &str, convert: bool) -> Cow<'_, str> {
-        if convert {
-            Cow::Owned(s.replace("-", "_"))
-        } else {
-            Cow::Borrowed(s)
-        }
+        if convert { Cow::Owned(s.replace("-", "_")) } else { Cow::Borrowed(s) }
     }
 
     table.iter().find_map(|(key, value)| {
