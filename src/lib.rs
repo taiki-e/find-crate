@@ -71,7 +71,10 @@
 //! Also, [`find_crate()`] and [`Manifest::new()`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.4.0")]
-#![doc(test(attr(deny(warnings), allow(dead_code, unused_assignments, unused_variables))))]
+#![doc(test(
+    no_crate_inject,
+    attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))
+))]
 #![warn(missing_docs, missing_debug_implementations)]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
