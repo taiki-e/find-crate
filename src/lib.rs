@@ -89,14 +89,22 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::use_self)]
 
+mod error;
+
+pub use crate::error::Error;
+
 use std::{
-    env, fmt,
+    env,
     fs::File,
-    io::{self, Read},
+    io::Read,
     path::{Path, PathBuf},
 };
 
 use toml::value::{Table, Value};
+
+use crate::error::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile};
+
+type Result<T> = std::result::Result<T, Error>;
 
 /// `CARGO_MANIFEST_DIR` environment variable.
 const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
@@ -376,68 +384,4 @@ where
             None
         }
     })
-}
-
-// =================================================================================================
-// Error
-
-type Result<T> = std::result::Result<T, Error>;
-
-use self::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile};
-
-/// An error that occurred when getting manifest.
-#[derive(Debug)]
-pub enum Error {
-    /// `CARGO_MANIFEST_DIR` environment variable not found.
-    NotFoundManifestDir,
-    /// `Cargo.toml` or specified manifest file not found.
-    NotFoundManifestFile(PathBuf),
-    /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
-    ///
-    /// [`find_crate()`]: fn.find_crate.html
-    NotFound(PathBuf),
-    /// An error occurred while to open or to read the manifest file.
-    Io(io::Error),
-    /// An error occurred while to parse the manifest file.
-    Toml(toml::de::Error),
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            NotFoundManifestDir => write!(f, "`{}` environment variable not found", MANIFEST_DIR),
-            NotFoundManifestFile(path) => {
-                write!(f, "the manifest file not found: {}", path.display())
-            }
-            NotFound(path) => write!(
-                f,
-                "the crate with the specified name not found in dependencies in {}",
-                path.display()
-            ),
-            Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
-            Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
-        }
-    }
-}
-
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Error::Io(e) => Some(e),
-            Error::Toml(e) => Some(e),
-            _ => None,
-        }
-    }
-}
-
-impl From<io::Error> for Error {
-    fn from(e: io::Error) -> Self {
-        Error::Io(e)
-    }
-}
-
-impl From<toml::de::Error> for Error {
-    fn from(e: toml::de::Error) -> Self {
-        Error::Toml(e)
-    }
 }
