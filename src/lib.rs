@@ -210,7 +210,7 @@ pub struct Manifest {
     manifest: Table,
 
     /// The kind of dependencies to be searched.
-    dependencies: Dependencies,
+    pub dependencies: Dependencies,
 }
 
 impl Manifest {
@@ -244,18 +244,6 @@ impl Manifest {
     /// Constructs a new `Manifest` from a toml table.
     pub fn from_toml(manifest: Table) -> Self {
         Self { manifest, dependencies: Dependencies::default() }
-    }
-
-    /// Returns the kind of dependencies to be searched.
-    #[inline]
-    pub fn dependencies(&self) -> Dependencies {
-        self.dependencies
-    }
-
-    /// Sets the kind of dependencies to be searched.
-    #[inline]
-    pub fn set_dependencies(&mut self, dependencies: Dependencies) {
-        self.dependencies = dependencies;
     }
 
     /// Find the crate.

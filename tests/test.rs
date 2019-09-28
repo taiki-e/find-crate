@@ -20,25 +20,25 @@ fn dependencies() {
 
     let mut manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
 
-    assert_eq!(Dependencies::Default, manifest.dependencies());
+    assert_eq!(Dependencies::Default, manifest.dependencies);
 
     assert_eq!(NAME1, manifest.find(|s| s == NAME1).unwrap().name);
     assert_eq!("0.1", manifest.find(|s| s == NAME1).unwrap().version);
 
-    manifest.set_dependencies(Dependencies::Dev);
+    manifest.dependencies = Dependencies::Dev;
     assert_eq!(NAME1, manifest.find(|s| s == NAME1).unwrap().name);
     assert_eq!("0.1.1", manifest.find(|s| s == NAME1).unwrap().version);
 
-    manifest.set_dependencies(Dependencies::Build);
+    manifest.dependencies = Dependencies::Build;
     assert_eq!(None, manifest.find(|s| s == NAME1));
 
     assert_eq!(NAME2, manifest.find(|s| s == NAME2).unwrap().name);
     assert_eq!("0.2", manifest.find(|s| s == NAME2).unwrap().version);
 
-    manifest.set_dependencies(Dependencies::Default);
+    manifest.dependencies = Dependencies::Default;
     assert_eq!(None, manifest.find(|s| s == NAME2));
 
-    manifest.set_dependencies(Dependencies::All);
+    manifest.dependencies = Dependencies::All;
     assert_eq!(NAME2, manifest.find(|s| s == NAME2).unwrap().name);
     assert_eq!("0.2", manifest.find(|s| s == NAME2).unwrap().version);
 
