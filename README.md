@@ -17,11 +17,18 @@
 [rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
 [rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
 
-Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
+Find the crate name from the current `Cargo.toml`.
 
-When writing declarative macros, `$crate` representing the current crate is very useful, but procedural macros do not have this. If you know the current name of the crate you want to use, you can do the same thing as `$crate`. This crate provides the features to make it easy.
+When writing declarative macros, `$crate` representing the current crate is
+very useful, but procedural macros do not have this. If you know the current
+name of the crate you want to use, you can do the same thing as `$crate`.
+This crate provides the features to make it easy.
 
-[Documentation](https://docs.rs/find-crate/)
+[Documentation][docs-url]
+
+Note: This crate is intended to provide more powerful features such as support for multiple crate names and versions. For general purposes, [proc-macro-crate], which provides a simpler API, may be easier to use.
+
+[proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
 ## Usage
 
@@ -44,7 +51,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 fn import() -> TokenStream {
-    let name = find_crate(|s| s == "foo").unwrap();
+    let name = find_crate(|s| s == "foo").unwrap().name;
     let name = Ident::new(&name, Span::call_site());
     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
@@ -59,14 +66,14 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 fn import() -> TokenStream {
-    let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap();
+    let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap().name;
     let name = Ident::new(&name, Span::call_site());
     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
 }
 ```
 
-Search for multiple crates. It is much more efficient than using `find_crate()` for each crate.
+Using `Manifest` to search for multiple crates. It is much more efficient than using `find_crate()` for each crate.
 
 ```rust
 use find_crate::Manifest;
@@ -85,7 +92,7 @@ fn imports() -> TokenStream {
     let manifest = manifest.lock();
 
     for names in CRATE_NAMES {
-        let name = manifest.find_name(|s| names.iter().any(|x| s == *x)).unwrap();
+        let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
         let name = Ident::new(&name, Span::call_site());
         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
@@ -95,7 +102,7 @@ fn imports() -> TokenStream {
 }
 ```
 
-By default it will be searched from `dependencies`, `dev-dependencies` and `build-dependencies`.
+By default it will be searched from `dependencies` and `dev-dependencies`.
 Also, `find_crate()` and `Manifest::new()` read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
 
 ## License

@@ -1,16 +1,17 @@
 [package]
 name = "find-crate"
-# NB: When modifying, also modify html_root_url in lib.rs
 version = "0.4.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
-description = "Find the crate name from the current Cargo.toml ($crate for proc-macro)."
 repository = "https://github.com/taiki-e/find-crate"
 documentation = "https://docs.rs/find-crate/"
-readme = "README.md"
 keywords = ["macros", "crate"]
 categories = ["development-tools::procedural-macro-helpers"]
+readme = "README.md"
+description = """
+Find the crate name from the current Cargo.toml.
+"""
 
 [dependencies]
 toml = "0.5.3"
@@ -18,3 +19,4 @@ toml = "0.5.3"
 [dev-dependencies]
 proc-macro2 = "1.0"
 quote = "1.0"
+semver = "0.9"
