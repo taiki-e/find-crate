@@ -1,4 +1,4 @@
-use std::{fmt, io, path::PathBuf};
+use std::{fmt, io};
 
 use super::MANIFEST_DIR;
 
@@ -7,8 +7,6 @@ use super::MANIFEST_DIR;
 pub enum Error {
     /// `CARGO_MANIFEST_DIR` environment variable not found.
     NotFoundManifestDir,
-    /// `Cargo.toml` or specified manifest file not found.
-    NotFoundManifestFile(PathBuf),
     /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
     ///
     /// [`find_crate()`]: fn.find_crate.html
@@ -24,9 +22,6 @@ impl fmt::Display for Error {
         match self {
             Error::NotFoundManifestDir => {
                 write!(f, "`{}` environment variable not found", MANIFEST_DIR)
-            }
-            Error::NotFoundManifestFile(path) => {
-                write!(f, "the manifest file not found: {}", path.display())
             }
             Error::NotFound => {
                 write!(f, "the crate with the specified name not found in dependencies")

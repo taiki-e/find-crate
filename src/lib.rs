@@ -102,8 +102,6 @@ use std::{
 
 use toml::value::{Table, Value};
 
-use crate::error::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile};
-
 type Result<T> = std::result::Result<T, Error>;
 
 /// `CARGO_MANIFEST_DIR` environment variable.
@@ -133,7 +131,7 @@ pub fn find_crate<P>(predicate: P) -> Result<Package>
 where
     P: FnMut(&str) -> bool,
 {
-    Manifest::new()?.find(predicate).ok_or(NotFound)
+    Manifest::new()?.find(predicate).ok_or(Error::NotFound)
 }
 
 /// The kind of dependencies to be searched.
@@ -229,14 +227,9 @@ impl Manifest {
         P: AsRef<Path>,
     {
         let manifest_path = manifest_path.as_ref();
-
-        if manifest_path.is_file() {
-            let mut bytes = Vec::new();
-            File::open(manifest_path)?.read_to_end(&mut bytes)?;
-            toml::from_slice(&bytes).map_err(Into::into).map(Self::from_toml)
-        } else {
-            Err(NotFoundManifestFile(manifest_path.to_owned()))
-        }
+        let mut bytes = Vec::new();
+        File::open(manifest_path)?.read_to_end(&mut bytes)?;
+        toml::from_slice(&bytes).map_err(Into::into).map(Self::from_toml)
     }
 
     /// Constructs a new `Manifest` from a toml table.
@@ -305,7 +298,7 @@ impl Manifest {
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR).ok_or(NotFoundManifestDir).map(PathBuf::from).map(|mut path| {
+    env::var_os(MANIFEST_DIR).ok_or(Error::NotFoundManifestDir).map(PathBuf::from).map(|mut path| {
         path.push("Cargo.toml");
         path
     })
