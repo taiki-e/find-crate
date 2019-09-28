@@ -133,8 +133,7 @@ pub fn find_crate<P>(predicate: P) -> Result<Package>
 where
     P: FnMut(&str) -> bool,
 {
-    let manifest_path = manifest_path()?;
-    Manifest::from_path(&manifest_path)?.find(predicate).ok_or_else(|| NotFound(manifest_path))
+    Manifest::new()?.find(predicate).ok_or(NotFound)
 }
 
 /// The kind of dependencies to be searched.
@@ -221,21 +220,20 @@ impl Manifest {
         Self::from_path(manifest_path()?)
     }
 
+    // TODO: Should we support custom manifest paths?
+    //       And what should we do if the file is not found?
+    //       (should we use `CARGO_MANIFEST_DIR`? Or should we return an error?)
     /// Constructs a new `Manifest` from the specified toml file.
-    pub fn from_path<P>(manifest_path: P) -> Result<Self>
+    fn from_path<P>(manifest_path: P) -> Result<Self>
     where
         P: AsRef<Path>,
     {
-        fn open(path: &Path) -> Result<Vec<u8>> {
-            let mut bytes = Vec::new();
-            File::open(path)?.read_to_end(&mut bytes)?;
-            Ok(bytes)
-        }
-
         let manifest_path = manifest_path.as_ref();
 
         if manifest_path.is_file() {
-            toml::from_slice(&open(manifest_path)?).map_err(Into::into).map(Self::from_toml)
+            let mut bytes = Vec::new();
+            File::open(manifest_path)?.read_to_end(&mut bytes)?;
+            toml::from_slice(&bytes).map_err(Into::into).map(Self::from_toml)
         } else {
             Err(NotFoundManifestFile(manifest_path.to_owned()))
         }

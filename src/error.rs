@@ -12,7 +12,7 @@ pub enum Error {
     /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
     ///
     /// [`find_crate()`]: fn.find_crate.html
-    NotFound(PathBuf),
+    NotFound,
     /// An error occurred while to open or to read the manifest file.
     Io(io::Error),
     /// An error occurred while to parse the manifest file.
@@ -28,11 +28,9 @@ impl fmt::Display for Error {
             Error::NotFoundManifestFile(path) => {
                 write!(f, "the manifest file not found: {}", path.display())
             }
-            Error::NotFound(path) => write!(
-                f,
-                "the crate with the specified name not found in dependencies in {}",
-                path.display()
-            ),
+            Error::NotFound => {
+                write!(f, "the crate with the specified name not found in dependencies")
+            }
             Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
             Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
         }
