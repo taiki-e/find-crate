@@ -61,7 +61,6 @@
 //! fn imports() -> TokenStream {
 //!     let mut tts = TokenStream::new();
 //!     let manifest = Manifest::new().unwrap();
-//!     let manifest = manifest.lock();
 //!
 //!     for names in CRATE_NAMES {
 //!         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
@@ -308,86 +307,6 @@ impl Manifest {
         P: FnMut(&str, &str) -> bool,
     {
         find(&self.manifest, self.dependencies, predicate)
-    }
-
-    /// Lock the kind of dependencies to be searched. This is more efficient if
-    /// you want to search multiple times without changing the kind of dependencies
-    /// to be searched.
-    pub fn lock(&self) -> ManifestLock<'_> {
-        let mut tables = Vec::new();
-        tables.extend(
-            self.dependencies
-                .as_slice()
-                .iter()
-                .filter_map(|&dependencies| self.manifest.get(dependencies)?.as_table()),
-        );
-        tables.extend(self.dependencies.as_slice().iter().flat_map(|&dependencies| {
-            self.manifest.get("target").and_then(Value::as_table).into_iter().flat_map(
-                move |table| {
-                    table
-                        .values()
-                        .filter_map(move |table| table.as_table()?.get(dependencies)?.as_table())
-                },
-            )
-        }));
-        ManifestLock { tables }
-    }
-}
-
-/// A locked reference to the dependencies tables of [`Manifest`] to be searched.
-#[derive(Debug, Clone)]
-pub struct ManifestLock<'a> {
-    tables: Vec<&'a Table>,
-}
-
-impl ManifestLock<'_> {
-    /// Find the crate.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust
-    /// use find_crate::Manifest;
-    /// use proc_macro2::{Ident, Span, TokenStream};
-    /// use quote::quote;
-    ///
-    /// const CRATE_NAMES: &[&[&str]] = &[
-    ///     &["foo", "foo-core"],
-    ///     &["bar", "bar-util", "bar-core"],
-    ///     &["baz"],
-    /// ];
-    ///
-    /// fn imports() -> TokenStream {
-    ///     let mut tts = TokenStream::new();
-    ///     let manifest = Manifest::new().unwrap();
-    ///     let manifest = manifest.lock();
-    ///
-    ///     for names in CRATE_NAMES {
-    ///         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
-    ///         let name = Ident::new(&name, Span::call_site());
-    ///         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
-    ///         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
-    ///         tts.extend(quote!(extern crate #name as #import_name;));
-    ///     }
-    ///     tts
-    /// }
-    /// ```
-    #[inline]
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
-    where
-        P: FnMut(&str) -> bool,
-    {
-        self.find2(|s, _| predicate(s))
-    }
-
-    /// Find the crate.
-    #[inline]
-    pub fn find2<P>(&self, mut predicate: P) -> Option<Package>
-    where
-        P: FnMut(&str, &str) -> bool,
-    {
-        self.tables
-            .iter()
-            .find_map(|dependencies| find_from_dependencies(dependencies, &mut predicate))
     }
 }
 

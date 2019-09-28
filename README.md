@@ -89,7 +89,6 @@ const CRATE_NAMES: &[&[&str]] = &[
 fn imports() -> TokenStream {
     let mut tts = TokenStream::new();
     let manifest = Manifest::new().unwrap();
-    let manifest = manifest.lock();
 
     for names in CRATE_NAMES {
         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
