@@ -50,7 +50,7 @@
 //! ```rust
 //! use find_crate::Manifest;
 //! use proc_macro2::{Ident, Span, TokenStream};
-//! use quote::quote;
+//! use quote::{format_ident, quote};
 //!
 //! const CRATE_NAMES: &[&[&str]] = &[
 //!     &["foo", "foo-core"],
@@ -65,7 +65,7 @@
 //!     for names in CRATE_NAMES {
 //!         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
 //!         let name = Ident::new(&name, Span::call_site());
-//!         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
+//!         let import_name = format_ident!("_{}", names[0]);
 //!         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
 //!         tts.extend(quote!(extern crate #name as #import_name;));
 //!     }
@@ -238,6 +238,8 @@ impl Manifest {
 
     /// Find the crate.
     ///
+    /// The argument of the closure is the original name of the package.
+    ///
     /// ## Examples
     ///
     /// ```rust
@@ -262,6 +264,9 @@ impl Manifest {
     }
 
     /// Find the crate.
+    ///
+    /// The first argument of the closure is the original name of the package
+    /// and the second argument is the version of the package.
     ///
     /// ## Examples
     ///

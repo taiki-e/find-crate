@@ -36,7 +36,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-find-crate = "0.4"
+find-crate = "0.5"
 ```
 
 The current find-crate requires Rust 1.31 or later.
@@ -78,7 +78,7 @@ Using `Manifest` to search for multiple crates. It is much more efficient than u
 ```rust
 use find_crate::Manifest;
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::quote;
+use quote::{format_ident, quote};
 
 const CRATE_NAMES: &[&[&str]] = &[
     &["foo", "foo-core"],
@@ -93,7 +93,7 @@ fn imports() -> TokenStream {
     for names in CRATE_NAMES {
         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
         let name = Ident::new(&name, Span::call_site());
-        let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
+        let import_name = format_ident!("_{}", names[0]);
         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
         tts.extend(quote!(extern crate #name as #import_name;));
     }
