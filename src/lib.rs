@@ -339,8 +339,8 @@ where
     {
         value
             .as_table()?
-            .get("package")
-            .and_then(Value::as_str)
+            .get("package")?
+            .as_str()
             .and_then(|s| if predicate(s, version) { Some(s.to_string()) } else { None })
     }
 
@@ -350,8 +350,8 @@ where
 
     table.iter().find_map(|(key, value)| {
         let version = version(value).unwrap_or("*");
-        let package = package(value, &version, &mut predicate);
-        if package.is_some() || predicate(key, &version) {
+        let package = package(value, version, &mut predicate);
+        if package.is_some() || predicate(key, version) {
             Some(Package {
                 key: key.clone(),
                 name: key.replace("-", "_"),
