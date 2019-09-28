@@ -215,18 +215,14 @@ impl Manifest {
     ///
     /// This function reads `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
     pub fn new() -> Result<Self> {
-        Self::from_path(manifest_path()?)
+        Self::from_path(&manifest_path()?)
     }
 
     // TODO: Should we support custom manifest paths?
     //       And what should we do if the file is not found?
     //       (should we use `CARGO_MANIFEST_DIR`? Or should we return an error?)
     /// Constructs a new `Manifest` from the specified toml file.
-    fn from_path<P>(manifest_path: P) -> Result<Self>
-    where
-        P: AsRef<Path>,
-    {
-        let manifest_path = manifest_path.as_ref();
+    fn from_path(manifest_path: &Path) -> Result<Self> {
         let mut bytes = Vec::new();
         File::open(manifest_path)?.read_to_end(&mut bytes)?;
         toml::from_slice(&bytes).map_err(Into::into).map(Self::from_toml)
