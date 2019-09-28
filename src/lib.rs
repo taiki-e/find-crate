@@ -1,9 +1,15 @@
-//! Find the crate name from the current `Cargo.toml` (`$crate` for proc-macro).
+//! Find the crate name from the current `Cargo.toml`.
 //!
 //! When writing declarative macros, `$crate` representing the current crate is
 //! very useful, but procedural macros do not have this. If you know the current
 //! name of the crate you want to use, you can do the same thing as `$crate`.
 //! This crate provides the features to make it easy.
+//!
+//! Note: This crate is intended to provide more powerful features such as
+//! support for multiple crate names and versions. For general purposes,
+//! [proc-macro-crate], which provides a simpler API, may be easier to use.
+//!
+//! [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 //!
 //! ## Examples
 //!
@@ -15,14 +21,15 @@
 //! use quote::quote;
 //!
 //! fn import() -> TokenStream {
-//!     let name = find_crate(|s| s == "foo").unwrap();
+//!     let name = find_crate(|s| s == "foo").unwrap().name;
 //!     let name = Ident::new(&name, Span::call_site());
 //!     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
 //!     quote!(extern crate #name as _foo;)
 //! }
 //! ```
 //!
-//! As in this example, it is easy to handle cases where proc-macro is exported from multiple crates.
+//! As in this example, it is easy to handle cases where proc-macro is exported
+//! from multiple crates.
 //!
 //! ```rust
 //! use find_crate::find_crate;
@@ -30,15 +37,15 @@
 //! use quote::quote;
 //!
 //! fn import() -> TokenStream {
-//!     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap();
+//!     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap().name;
 //!     let name = Ident::new(&name, Span::call_site());
 //!     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
 //!     quote!(extern crate #name as _foo;)
 //! }
 //! ```
 //!
-//! Search for multiple crates. It is much more efficient than using
-//! [`find_crate()`] for each crate.
+//! Using [`Manifest`] to search for multiple crates. It is much more efficient
+//! than using `find_crate()` for each crate.
 //!
 //! ```rust
 //! use find_crate::Manifest;
@@ -57,7 +64,7 @@
 //!     let manifest = manifest.lock();
 //!
 //!     for names in CRATE_NAMES {
-//!         let name = manifest.find_name(|s| names.iter().any(|x| s == *x)).unwrap();
+//!         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
 //!         let name = Ident::new(&name, Span::call_site());
 //!         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
 //!         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
@@ -67,7 +74,7 @@
 //! }
 //! ```
 //!
-//! By default it will be searched from `dependencies`, `dev-dependencies` and `build-dependencies`.
+//! By default it will be searched from `dependencies` and `dev-dependencies`.
 //! Also, [`find_crate()`] and [`Manifest::new()`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.4.0")]
@@ -81,83 +88,25 @@
 // It cannot be included in the published code because these lints have false positives in the minimum required version.
 #![cfg_attr(test, warn(single_use_lifetimes))]
 #![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::use_self)]
 
 use std::{
-    borrow::Cow,
-    env,
-    error,
-    fmt,
+    env, fmt,
     fs::File,
-    io::{self, Read as _Read}, // Rust 1.33+ => Read as _
-    ops::Deref,
+    io::{self, Read},
     path::{Path, PathBuf},
-    result,
 };
 
 use toml::value::{Table, Value};
 
-use self::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile, Open, Read, Toml};
-
-type Result<T> = result::Result<T, Error>;
-
-/// The kinds of dependencies searched by default.
-pub const DEFAULT_DEPENDENCIES: &[&str] = &_DEFAULT_DEPENDENCIES;
-
-// for const_err
-const _DEFAULT_DEPENDENCIES: [&str; 3] = ["dependencies", "dev-dependencies", "build-dependencies"];
-
 /// `CARGO_MANIFEST_DIR` environment variable.
 const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
-
-/// An error that occurred when getting manifest.
-#[derive(Debug)]
-pub enum Error {
-    /// `CARGO_MANIFEST_DIR` environment variable not found.
-    NotFoundManifestDir,
-    /// `Cargo.toml` or specified manifest file not found.
-    NotFoundManifestFile(PathBuf),
-    /// An error occurred while to open the manifest file.
-    Open(PathBuf, io::Error),
-    /// An error occurred while reading the manifest file.
-    Read(PathBuf, io::Error),
-    /// An error occurred while parsing the manifest file.
-    Toml(toml::de::Error),
-    /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
-    ///
-    /// [`find_crate()`]: fn.find_crate.html
-    NotFound(PathBuf),
-}
-
-impl fmt::Display for Error {
-    #[rustfmt::skip]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use self::_DEFAULT_DEPENDENCIES as D;
-        match self {
-            NotFoundManifestDir => write!(f, "`{}` environment variable not found", MANIFEST_DIR),
-            NotFoundManifestFile(path) => write!(f, "the manifest file not found: {}", path.display()),
-            Open(path, err) => write!(f, "an error occurred while to open {}: {}", path.display(), err),
-            Read(path, err) => write!(f, "an error occurred while reading {}: {}", path.display(), err),
-            Toml(err) => write!(f, "an error occurred while parsing the manifest file: {}", err),
-            NotFound(path) => write!(f, "the crate with the specified name not found in {}, {} or {} in {}", D[0], D[1], D[2], path.display()),
-        }
-    }
-}
-
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        match self {
-            Open(_, err) | Read(_, err) => Some(err),
-            Toml(err) => Some(err),
-            _ => None,
-        }
-    }
-}
 
 /// Find the crate name from the current `Cargo.toml`.
 ///
 /// This function reads `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
 ///
-/// Note that this function must be used in the context of proc-macro.
+/// Note that this function needs to be used in the context of procedural macros.
 ///
 /// ## Examples
 ///
@@ -167,187 +116,139 @@ impl error::Error for Error {
 /// use quote::quote;
 ///
 /// fn import() -> TokenStream {
-///     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap();
+///     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap().name;
 ///     let name = Ident::new(&name, Span::call_site());
 ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
 ///     quote!(extern crate #name as _foo;)
 /// }
 /// ```
-pub fn find_crate<P>(predicate: P) -> Result<String>
+pub fn find_crate<P>(predicate: P) -> Result<Package>
 where
     P: FnMut(&str) -> bool,
 {
     let manifest_path = manifest_path()?;
-    Manifest::from_path(&manifest_path)?
-        .find(predicate)
-        .map(|package| package.rust_ident.into_owned())
-        .ok_or_else(|| NotFound(manifest_path))
+    Manifest::from_path(&manifest_path)?.find(predicate).ok_or_else(|| NotFound(manifest_path))
 }
 
+/// The kind of dependencies to be searched.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct FindOptions<'a> {
-    /// The names of the tables to be searched
-    dependencies: &'a [&'a str],
-
-    /// Whether or not to convert the name of the retrieved crate to a valid
-    /// rust identifier
-    rust_ident: bool,
+pub enum Dependencies {
+    /// Search from `dependencies` and `dev-dependencies`.
+    Default,
+    /// Search from `dependencies`.
+    Release,
+    /// Search from `dev-dependencies`.
+    Dev,
+    /// Search from `build-dependencies`.
+    Build,
+    /// Search from `dependencies`, `dev-dependencies` and `build-dependencies`.
+    All,
 }
 
-impl Default for FindOptions<'_> {
+impl Dependencies {
+    fn as_slice(self) -> &'static [&'static str] {
+        match self {
+            Dependencies::Default => &["dependencies", "dev-dependencies"],
+            Dependencies::Release => &["dependencies"],
+            Dependencies::Dev => &["dev-dependencies"],
+            Dependencies::Build => &["build-dependencies"],
+            Dependencies::All => &["dependencies", "dev-dependencies", "build-dependencies"],
+        }
+    }
+}
+
+impl Default for Dependencies {
     fn default() -> Self {
-        Self { dependencies: DEFAULT_DEPENDENCIES, rust_ident: true }
+        Dependencies::Default
     }
 }
 
 /// The package data. This has information on the current package name,
 /// original package name, and specified version.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Package<'a> {
+pub struct Package {
     /// The key of this dependency in the manifest.
-    key: &'a str,
+    key: String,
 
-    // value or version key's value
-    /// The specified version of the package.
-    version: Option<&'a str>,
+    // The key or the value of 'package' key.
+    // If this is `None`, the value of `key` field is the original name.
+    package: Option<String>,
 
-    // key or package key's value
-    /// If this is `None`, the value of `key` field is the original name.
-    package: Option<&'a str>,
+    /// The current name of the package. This is always a valid rust identifier.
+    pub name: String,
 
-    /// If this is `Cow::Owned`, the value is a valid rust identifier.
-    rust_ident: Cow<'a, str>,
+    /// The version requirement of the package. Returns `*` if no version
+    /// requirement is specified.
+    pub version: String,
 }
 
-impl Package<'_> {
-    /// Returns the current package name.
-    pub fn name(&self) -> &str {
-        &self.rust_ident
-    }
-
+impl Package {
     /// Returns the original package name.
     pub fn original_name(&self) -> &str {
         self.package.as_ref().unwrap_or(&self.key)
     }
 
-    /// Returns `true` if the value returned by `Package::name()` is a valid rust
-    /// identifier.
-    pub fn is_rust_ident(&self) -> bool {
-        match &self.rust_ident {
-            Cow::Borrowed(s) => !s.contains('-'),
-            Cow::Owned(_) => true,
-        }
-    }
-
-    /// Returns `true` if the value returned by `Package::name()` is the original
-    /// package name.
+    /// Returns `true` if the value returned by [`name`][Package::name] is the
+    /// original package name.
     pub fn is_original(&self) -> bool {
         self.package.is_none()
-    }
-
-    /// Returns the version of the package.
-    pub fn version(&self) -> Option<&str> {
-        self.version.as_ref().map(Deref::deref)
     }
 }
 
 /// The manifest of cargo.
 ///
-/// Note that this item must be used in the context of proc-macro.
+/// Note that this function needs to be used in the context of procedural macros.
 #[derive(Debug, Clone)]
-pub struct Manifest<'a> {
+pub struct Manifest {
     manifest: Table,
-    options: FindOptions<'a>,
+
+    /// The kind of dependencies to be searched.
+    dependencies: Dependencies,
 }
 
-impl<'a> Manifest<'a> {
+impl Manifest {
     /// Constructs a new `Manifest` from the current `Cargo.toml`.
     ///
     /// This function reads `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
     pub fn new() -> Result<Self> {
-        Self::from_path(&manifest_path()?)
+        Self::from_path(manifest_path()?)
     }
 
     /// Constructs a new `Manifest` from the specified toml file.
-    pub fn from_path(manifest_path: &Path) -> Result<Self> {
+    pub fn from_path<P>(manifest_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         fn open(path: &Path) -> Result<Vec<u8>> {
             let mut bytes = Vec::new();
-            File::open(path)
-                .map_err(|e| Open(path.to_owned(), e))?
-                .read_to_end(&mut bytes)
-                .map_err(|e| Read(path.to_owned(), e))
-                .map(|_| bytes)
+            File::open(path)?.read_to_end(&mut bytes)?;
+            Ok(bytes)
         }
 
+        let manifest_path = manifest_path.as_ref();
+
         if manifest_path.is_file() {
-            Self::from_bytes(&open(manifest_path)?)
+            toml::from_slice(&open(manifest_path)?).map_err(Into::into).map(Self::from_toml)
         } else {
             Err(NotFoundManifestFile(manifest_path.to_owned()))
         }
     }
 
-    /// Constructs a new `Manifest` from the bytes.
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        toml::from_slice(bytes).map_err(Toml).map(Self::from_raw)
+    /// Constructs a new `Manifest` from a toml table.
+    pub fn from_toml(manifest: Table) -> Self {
+        Self { manifest, dependencies: Dependencies::default() }
     }
 
-    /// Constructs a new `Manifest` from the raw manifest.
-    fn from_raw(manifest: Table) -> Self {
-        Manifest { manifest, options: FindOptions::default() }
+    /// Returns the kind of dependencies to be searched.
+    #[inline]
+    pub fn dependencies(&self) -> Dependencies {
+        self.dependencies
     }
 
-    /// Returns the kinds of dependencies to be searched. The default is
-    /// `dependencies`, `dev-dependencies` and `build-dependencies`.
-    pub fn dependencies(&self) -> &[&str] {
-        self.options.dependencies
-    }
-
-    /// Sets the kinds of dependencies to be searched. The default is
-    /// `dependencies`, `dev-dependencies` and `build-dependencies`.
-    pub fn set_dependencies(&mut self, dependencies: &'a [&'a str]) {
-        self.options.dependencies = dependencies;
-    }
-
-    /// Returns whether or not to convert the name of the retrieved crate to a
-    /// valid rust identifier. The default is `true`.
-    pub fn rust_ident(&self) -> bool {
-        self.options.rust_ident
-    }
-
-    /// Sets whether or not to convert the name of the retrieved crate to a
-    /// valid rust identifier.
-    pub fn set_rust_ident(&mut self, rust_ident: bool) {
-        self.options.rust_ident = rust_ident;
-    }
-
-    /// Lock the kinds of dependencies to be searched. This is more efficient when you want to
-    /// search multiple times without changing the kinds of dependencies to be searched.
-    pub fn lock(&self) -> ManifestLock<'_> {
-        ManifestLock::new(self)
-    }
-
-    /// Find the crate name.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust
-    /// use find_crate::Manifest;
-    /// use proc_macro2::{Ident, Span, TokenStream};
-    /// use quote::quote;
-    ///
-    /// fn import() -> TokenStream {
-    ///     let manifest = Manifest::new().unwrap();
-    ///     let name = manifest.find_name(|s| s == "foo" || s == "foo-core").unwrap();
-    ///     let name = Ident::new(&name, Span::call_site());
-    ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
-    ///     quote!(extern crate #name as _foo;)
-    /// }
-    /// ```
-    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<'_, str>>
-    where
-        P: FnMut(&str) -> bool,
-    {
-        self.find(predicate).map(|package| package.rust_ident)
+    /// Sets the kind of dependencies to be searched.
+    #[inline]
+    pub fn set_dependencies(&mut self, dependencies: Dependencies) {
+        self.dependencies = dependencies;
     }
 
     /// Find the crate.
@@ -361,47 +262,86 @@ impl<'a> Manifest<'a> {
     ///
     /// fn import() -> TokenStream {
     ///     let manifest = Manifest::new().unwrap();
-    ///     let package = manifest.find(|s| s == "foo" || s == "foo-core").unwrap();
-    ///     let name = Ident::new(package.name(), Span::call_site());
+    ///     let name = manifest.find(|s| s == "foo" || s == "foo-core").unwrap().name;
+    ///     let name = Ident::new(&name, Span::call_site());
     ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package<'_>>
+    #[inline]
+    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
     where
         P: FnMut(&str) -> bool,
     {
-        self.dependencies().iter().find_map(|dependencies| {
-            self.manifest
-                .get(*dependencies)
-                .and_then(Value::as_table)
-                .and_then(|t| find_from_dependencies(t, &mut predicate, self.rust_ident()))
-        })
+        self.find2(|s, _| predicate(s))
+    }
+
+    /// Find the crate.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// use find_crate::Manifest;
+    /// use proc_macro2::{Ident, Span, TokenStream};
+    /// use quote::quote;
+    /// use semver::{Version, VersionReq};
+    ///
+    /// fn check_version(req: &str, version: &Version) -> bool {
+    ///     VersionReq::parse(req).unwrap().matches(version)
+    /// }
+    ///
+    /// fn import() -> TokenStream {
+    ///     let version = Version::parse("0.3.0").unwrap();
+    ///     let manifest = Manifest::new().unwrap();
+    ///     let name = manifest
+    ///         .find2(|name, req| name == "foo" && check_version(req, &version))
+    ///         .unwrap()
+    ///         .name;
+    ///     let name = Ident::new(&name, Span::call_site());
+    ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
+    ///     quote!(extern crate #name as _foo;)
+    /// }
+    /// ```
+    #[inline]
+    pub fn find2<P>(&self, predicate: P) -> Option<Package>
+    where
+        P: FnMut(&str, &str) -> bool,
+    {
+        find(&self.manifest, self.dependencies, predicate)
+    }
+
+    /// Lock the kind of dependencies to be searched. This is more efficient if
+    /// you want to search multiple times without changing the kind of dependencies
+    /// to be searched.
+    pub fn lock(&self) -> ManifestLock<'_> {
+        let mut tables = Vec::new();
+        tables.extend(
+            self.dependencies
+                .as_slice()
+                .iter()
+                .filter_map(|&dependencies| self.manifest.get(dependencies)?.as_table()),
+        );
+        tables.extend(self.dependencies.as_slice().iter().flat_map(|&dependencies| {
+            self.manifest.get("target").and_then(Value::as_table).into_iter().flat_map(
+                move |table| {
+                    table
+                        .values()
+                        .filter_map(move |table| table.as_table()?.get(dependencies)?.as_table())
+                },
+            )
+        }));
+        ManifestLock { tables }
     }
 }
 
-/// A locked reference to the dependencies tables of `Manifest` to be searched.
+/// A locked reference to the dependencies tables of [`Manifest`] to be searched.
 #[derive(Debug, Clone)]
 pub struct ManifestLock<'a> {
-    manifest: &'a Manifest<'a>,
     tables: Vec<&'a Table>,
 }
 
-impl<'a> ManifestLock<'a> {
-    fn new(manifest: &'a Manifest<'a>) -> Self {
-        Self {
-            tables: manifest
-                .dependencies()
-                .iter()
-                .filter_map(|&dependencies| {
-                    manifest.manifest.get(dependencies).and_then(Value::as_table)
-                })
-                .collect(),
-            manifest,
-        }
-    }
-
-    /// Find the crate name.
+impl ManifestLock<'_> {
+    /// Find the crate.
     ///
     /// ## Examples
     ///
@@ -422,7 +362,7 @@ impl<'a> ManifestLock<'a> {
     ///     let manifest = manifest.lock();
     ///
     ///     for names in CRATE_NAMES {
-    ///         let name = manifest.find_name(|s| names.iter().any(|x| s == *x)).unwrap();
+    ///         let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
     ///         let name = Ident::new(&name, Span::call_site());
     ///         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
     ///         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
@@ -431,102 +371,154 @@ impl<'a> ManifestLock<'a> {
     ///     tts
     /// }
     /// ```
-    pub fn find_name<P>(&self, predicate: P) -> Option<Cow<'_, str>>
+    #[inline]
+    pub fn find<P>(&self, mut predicate: P) -> Option<Package>
     where
         P: FnMut(&str) -> bool,
     {
-        self.find(predicate).map(|package| package.rust_ident)
+        self.find2(|s, _| predicate(s))
     }
 
     /// Find the crate.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust
-    /// use find_crate::Manifest;
-    /// use proc_macro2::{Ident, Span, TokenStream};
-    /// use quote::quote;
-    ///
-    /// const CRATE_NAMES: &[&[&str]] = &[
-    ///     &["foo", "foo-core"],
-    ///     &["bar", "bar-util", "bar-core"],
-    ///     &["baz"],
-    /// ];
-    ///
-    /// fn imports() -> TokenStream {
-    ///     let mut tts = TokenStream::new();
-    ///     let manifest = Manifest::new().unwrap();
-    ///     let manifest = manifest.lock();
-    ///
-    ///     for names in CRATE_NAMES {
-    ///         let package = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap();
-    ///         let name = Ident::new(package.name(), Span::call_site());
-    ///         let import_name = Ident::new(&format!("_{}", names[0]), Span::call_site());
-    ///         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
-    ///         tts.extend(quote!(extern crate #name as #import_name;));
-    ///     }
-    ///     tts
-    /// }
-    /// ```
-    pub fn find<P>(&self, mut predicate: P) -> Option<Package<'_>>
+    #[inline]
+    pub fn find2<P>(&self, mut predicate: P) -> Option<Package>
     where
-        P: FnMut(&str) -> bool,
+        P: FnMut(&str, &str) -> bool,
     {
-        self.tables.iter().find_map(|dependencies| {
-            find_from_dependencies(dependencies, &mut predicate, self.manifest.rust_ident())
-        })
+        self.tables
+            .iter()
+            .find_map(|dependencies| find_from_dependencies(dependencies, &mut predicate))
     }
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR).ok_or(NotFoundManifestDir).map(PathBuf::from).map(
-        |mut manifest_path| {
-            manifest_path.push("Cargo.toml");
-            manifest_path
-        },
-    )
+    env::var_os(MANIFEST_DIR).ok_or(NotFoundManifestDir).map(PathBuf::from).map(|mut path| {
+        path.push("Cargo.toml");
+        path
+    })
 }
 
-fn find_from_dependencies<P>(table: &Table, mut predicate: P, convert: bool) -> Option<Package<'_>>
+fn find<P>(manifest: &Table, dependencies: Dependencies, mut predicate: P) -> Option<Package>
 where
-    P: FnMut(&str) -> bool,
+    P: FnMut(&str, &str) -> bool,
 {
-    fn package<P>(value: &Value, predicate: P) -> Option<&str>
+    fn find_inner<P>(table: &Table, dependencies: &str, predicate: P) -> Option<Package>
     where
-        P: FnOnce(&str) -> bool,
+        P: FnMut(&str, &str) -> bool,
+    {
+        find_from_dependencies(table.get(dependencies)?.as_table()?, predicate)
+    }
+
+    dependencies
+        .as_slice()
+        .iter()
+        .find_map(|dependencies| find_inner(manifest, dependencies, &mut predicate))
+        .or_else(|| {
+            dependencies.as_slice().iter().find_map(|dependencies| {
+                manifest
+                    .get("target")?
+                    .as_table()?
+                    .values()
+                    .find_map(|table| find_inner(table.as_table()?, dependencies, &mut predicate))
+            })
+        })
+}
+
+fn find_from_dependencies<P>(table: &Table, mut predicate: P) -> Option<Package>
+where
+    P: FnMut(&str, &str) -> bool,
+{
+    fn package<P>(value: &Value, version: &str, predicate: P) -> Option<String>
+    where
+        P: FnOnce(&str, &str) -> bool,
     {
         value
-            .as_table()
-            .and_then(|t| t.get("package"))
+            .as_table()?
+            .get("package")
             .and_then(Value::as_str)
-            .and_then(|s| if predicate(s) { Some(s) } else { None })
+            .and_then(|s| if predicate(s, version) { Some(s.to_string()) } else { None })
     }
 
     fn version(value: &Value) -> Option<&str> {
-        value
-            .as_str()
-            .or_else(|| value.as_table().and_then(|t| t.get("version")).and_then(Value::as_str))
-    }
-
-    fn rust_ident(s: &str, convert: bool) -> Cow<'_, str> {
-        if convert { Cow::Owned(s.replace("-", "_")) } else { Cow::Borrowed(s) }
+        value.as_str().or_else(|| value.as_table()?.get("version")?.as_str())
     }
 
     table.iter().find_map(|(key, value)| {
-        if predicate(key) {
+        let version = version(value).unwrap_or("*");
+        let package = package(value, &version, &mut predicate);
+        if package.is_some() || predicate(key, &version) {
             Some(Package {
-                key,
-                version: version(value),
-                package: None,
-                rust_ident: rust_ident(key, convert),
+                key: key.clone(),
+                name: key.replace("-", "_"),
+                version: version.to_string(),
+                package,
             })
         } else {
-            package(value, &mut predicate).map(|package| Package {
-                key,
-                version: version(value),
-                package: Some(package),
-                rust_ident: rust_ident(key, convert),
-            })
+            None
         }
     })
+}
+
+// =================================================================================================
+// Error
+
+type Result<T> = std::result::Result<T, Error>;
+
+use self::Error::{NotFound, NotFoundManifestDir, NotFoundManifestFile};
+
+/// An error that occurred when getting manifest.
+#[derive(Debug)]
+pub enum Error {
+    /// `CARGO_MANIFEST_DIR` environment variable not found.
+    NotFoundManifestDir,
+    /// `Cargo.toml` or specified manifest file not found.
+    NotFoundManifestFile(PathBuf),
+    /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
+    ///
+    /// [`find_crate()`]: fn.find_crate.html
+    NotFound(PathBuf),
+    /// An error occurred while to open or to read the manifest file.
+    Io(io::Error),
+    /// An error occurred while to parse the manifest file.
+    Toml(toml::de::Error),
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            NotFoundManifestDir => write!(f, "`{}` environment variable not found", MANIFEST_DIR),
+            NotFoundManifestFile(path) => {
+                write!(f, "the manifest file not found: {}", path.display())
+            }
+            NotFound(path) => write!(
+                f,
+                "the crate with the specified name not found in dependencies in {}",
+                path.display()
+            ),
+            Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
+            Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
+        }
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Error::Io(e) => Some(e),
+            Error::Toml(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(e: io::Error) -> Self {
+        Error::Io(e)
+    }
+}
+
+impl From<toml::de::Error> for Error {
+    fn from(e: toml::de::Error) -> Self {
+        Error::Toml(e)
+    }
 }
