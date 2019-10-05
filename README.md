@@ -1,13 +1,10 @@
 # find-crate
 
-[![ci-badge]][ci-url]
 [![crates-badge]][crates-url]
 [![docs-badge]][docs-url]
 [![license-badge]][license]
 [![rustc-badge]][rustc-url]
 
-[ci-badge]: https://github.com/taiki-e/find-crate/workflows/ci/badge.svg
-[ci-url]: https://github.com/taiki-e/find-crate/actions?workflow=ci
 [crates-badge]: https://img.shields.io/crates/v/find-crate.svg
 [crates-url]: https://crates.io/crates/find-crate/
 [docs-badge]: https://docs.rs/find-crate/badge.svg
