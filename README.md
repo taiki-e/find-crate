@@ -1,16 +1,19 @@
 # find-crate
 
-[![Crates.io][crates-version-badge]][crates-url]
-[![Docs.rs][docs-badge]][docs-url]
-[![License][crates-license-badge]][crates-url]
-[![Minimum supported Rust version][rustc-badge]][rustc-url]
+[![ci-badge]][ci-url]
+[![crates-badge]][crates-url]
+[![docs-badge]][docs-url]
+[![license-badge]][license]
+[![rustc-badge]][rustc-url]
 
-[crates-version-badge]: https://img.shields.io/crates/v/find-crate.svg
-[crates-license-badge]: https://img.shields.io/crates/l/find-crate.svg
+[ci-badge]: https://github.com/taiki-e/find-crate/workflows/ci/badge.svg
+[ci-url]: https://github.com/taiki-e/find-crate/actions?workflow=ci
 [crates-badge]: https://img.shields.io/crates/v/find-crate.svg
 [crates-url]: https://crates.io/crates/find-crate/
 [docs-badge]: https://docs.rs/find-crate/badge.svg
 [docs-url]: https://docs.rs/find-crate/
+[license-badge]: https://img.shields.io/crates/l/find-crate.svg
+[license]: #license
 [rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
 [rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
 
