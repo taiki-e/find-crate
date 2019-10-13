@@ -195,8 +195,10 @@ impl Package {
         self.package.as_ref().unwrap_or(&self.key)
     }
 
-    /// Returns `true` if the value returned by [`name`][Package::name] is the
-    /// original package name.
+    /// Returns `true` if the value of the [`name`] field is the original package
+    /// name.
+    ///
+    /// [`name`]: Package::name
     pub fn is_original(&self) -> bool {
         self.package.is_none()
     }
