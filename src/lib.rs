@@ -89,8 +89,7 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::all, clippy::pedantic)]
-#![allow(clippy::use_self)]
+#![warn(clippy::all)]
 
 mod error;
 
