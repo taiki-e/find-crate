@@ -13,6 +13,8 @@ description = """
 Find the crate name from the current Cargo.toml.
 """
 
+[workspace]
+
 [dependencies]
 toml = "0.5.3"
 
