@@ -90,6 +90,8 @@
     unreachable_pub
 )]
 #![warn(clippy::all)]
+// mem::take requires Rust 1.40
+#![allow(clippy::mem_replace_with_default)]
 
 mod error;
 
@@ -303,10 +305,12 @@ impl Manifest {
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR).ok_or(Error::NotFoundManifestDir).map(PathBuf::from).map(|mut path| {
-        path.push("Cargo.toml");
-        path
-    })
+    env::var_os(MANIFEST_DIR).ok_or(Error::NotFoundManifestDir).map(PathBuf::from).map(
+        |mut path| {
+            path.push("Cargo.toml");
+            path
+        },
+    )
 }
 
 fn find<P>(manifest: &Table, dependencies: Dependencies, mut predicate: P) -> Option<Package>
