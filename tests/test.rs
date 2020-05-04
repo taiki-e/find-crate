@@ -1,3 +1,5 @@
+#![warn(rust_2018_idioms, single_use_lifetimes)]
+
 use find_crate::*;
 use semver::{Version, VersionReq};
 
