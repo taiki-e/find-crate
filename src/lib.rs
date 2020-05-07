@@ -99,7 +99,6 @@ use std::{
     io::{self, Read},
     path::{Path, PathBuf},
 };
-
 use toml::value::{Table, Value};
 
 type Result<T> = std::result::Result<T, Error>;

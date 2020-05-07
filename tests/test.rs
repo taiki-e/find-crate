@@ -1,6 +1,6 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
-use find_crate::*;
+use find_crate::{Dependencies, Manifest};
 use semver::{Version, VersionReq};
 
 #[test]
