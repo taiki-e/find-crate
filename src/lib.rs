@@ -11,7 +11,7 @@
 //!
 //! [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 //!
-//! ## Examples
+//! # Examples
 //!
 //! [`find_crate()`] gets the crate name from `Cargo.toml`.
 //!
@@ -112,7 +112,7 @@ const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 ///
 /// Note that this function needs to be used in the context of procedural macros.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```rust
 /// use find_crate::find_crate;
@@ -238,7 +238,7 @@ impl Manifest {
     ///
     /// The argument of the closure is the original name of the package.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     /// ```rust
     /// use find_crate::Manifest;
@@ -266,7 +266,7 @@ impl Manifest {
     /// The first argument of the closure is the original name of the package
     /// and the second argument is the version of the package.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     /// ```rust
     /// use find_crate::Manifest;

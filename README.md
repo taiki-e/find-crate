@@ -9,7 +9,7 @@
 [crates-url]: https://crates.io/crates/find-crate
 [docs-badge]: https://docs.rs/find-crate/badge.svg
 [docs-url]: https://docs.rs/find-crate
-[license-badge]: https://img.shields.io/crates/l/find-crate.svg
+[license-badge]: https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg
 [license]: #license
 [rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
 [rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
@@ -20,8 +20,6 @@ When writing declarative macros, `$crate` representing the current crate is
 very useful, but procedural macros do not have this. If you know the current
 name of the crate you want to use, you can do the same thing as `$crate`.
 This crate provides the features to make it easy.
-
-[Documentation][docs-url]
 
 Note: This crate is intended to provide more powerful features such as support for multiple crate names and versions. For general purposes, [proc-macro-crate], which provides a simpler API, may be easier to use.
 

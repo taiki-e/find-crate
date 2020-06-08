@@ -30,7 +30,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 * Removed version dependent behavior.
 
-* Improved documentation.
+* Documentation improvements.
 
 ## [0.2.0] - 2019-02-13
 
@@ -42,7 +42,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [0.1.1] - 2019-02-13
 
-* Improved documentation.
+* Documentation improvements.
 
 ## [0.1.0] - 2019-02-13
 
