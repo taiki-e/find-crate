@@ -128,3 +128,17 @@ fn find2() {
     assert_eq!(NAME3, manifest.find2(|s, v| s == NAME3 && check(v, &version)).unwrap().name);
     assert_eq!("*", manifest.find2(|s, v| s == NAME3 && check(v, &version)).unwrap().version);
 }
+
+#[test] 
+fn crate_name() {
+    const MANIFEST: &str = r#"
+    [package]
+    name = "crate-name"
+    version = "0.1.0"
+    "#;
+
+    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let package = manifest.crate_package().unwrap();
+    assert_eq!("crate_name", package.name);
+    assert_eq!("0.1.0", package.version);
+}
