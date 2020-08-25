@@ -129,7 +129,7 @@ fn find2() {
     assert_eq!("*", manifest.find2(|s, v| s == NAME3 && check(v, &version)).unwrap().version);
 }
 
-#[test] 
+#[test]
 fn crate_name() {
     const MANIFEST: &str = r#"
     [package]

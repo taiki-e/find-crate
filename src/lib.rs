@@ -299,21 +299,26 @@ impl Manifest {
     }
 
     /// The package for the crate that this manifest represents.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
     ///
-    /// fn crate_name() -> TokenStream {
+    /// fn current_crate_name() -> TokenStream {
+    ///     let manifest = Manifest::new().unwrap();
+    ///     let current_crate_package = manifest.crate_package().unwrap();
+    ///     let name = Ident::new(&current_crate_package.name, Span::call_site());
+    ///     quote!(#name)
     /// }
     /// ```
     pub fn crate_package(&self) -> Result<Package> {
-        let package_section = self.manifest.get("package").ok_or_else(|| {
-            Error::InvalidManifest("[package] section is missing".to_string())
-        })?;
+        let package_section = self
+            .manifest
+            .get("package")
+            .ok_or_else(|| Error::InvalidManifest("[package] section is missing".to_string()))?;
 
         let package_key_value = package_section.get("name").ok_or_else(|| {
             Error::InvalidManifest("[package] section is missing `name`".to_string())
@@ -322,7 +327,9 @@ impl Manifest {
         let package_key = match package_key_value {
             Value::String(name) => name,
             _ => {
-                return Err(Error::InvalidManifest("`name` in [package] section is not a string".to_string()))
+                return Err(Error::InvalidManifest(
+                    "`name` in [package] section is not a string".to_string(),
+                ));
             }
         };
 
@@ -333,7 +340,9 @@ impl Manifest {
         let package_version = match package_version_value {
             Value::String(version) => version,
             _ => {
-                return Err(Error::InvalidManifest("`version` in [package] section is not a string".to_string()))
+                return Err(Error::InvalidManifest(
+                    "`version` in [package] section is not a string".to_string(),
+                ));
             }
         };
 
