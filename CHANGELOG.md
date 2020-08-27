@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [0.6.0] - 2020-08-27
 
-* Add `Manifest::crate_package`.
+* [Add `Manifest::crate_package`.](https://github.com/taiki-e/find-crate/pull/12)
 
 * Make `Error` non-exhaustive.
 
