@@ -297,6 +297,64 @@ impl Manifest {
     {
         find(&self.manifest, self.dependencies, predicate)
     }
+
+    /// The package for the crate that this manifest represents.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use find_crate::Manifest;
+    /// use proc_macro2::{Ident, Span, TokenStream};
+    /// use quote::quote;
+    ///
+    /// fn current_crate_name() -> TokenStream {
+    ///     let manifest = Manifest::new().unwrap();
+    ///     let current_crate_package = manifest.crate_package().unwrap();
+    ///     let name = Ident::new(&current_crate_package.name, Span::call_site());
+    ///     quote!(#name)
+    /// }
+    /// ```
+    pub fn crate_package(&self) -> Result<Package> {
+        let package_section = self
+            .manifest
+            .get("package")
+            .ok_or_else(|| Error::InvalidManifest("[package] section is missing".to_string()))?;
+
+        let package_key_value = package_section.get("name").ok_or_else(|| {
+            Error::InvalidManifest("[package] section is missing `name`".to_string())
+        })?;
+
+        let package_key = match package_key_value {
+            Value::String(name) => name,
+            _ => {
+                return Err(Error::InvalidManifest(
+                    "`name` in [package] section is not a string".to_string(),
+                ));
+            }
+        };
+
+        let package_version_value = package_section.get("version").ok_or_else(|| {
+            Error::InvalidManifest("[package] section is missing `version`".to_string())
+        })?;
+
+        let package_version = match package_version_value {
+            Value::String(version) => version,
+            _ => {
+                return Err(Error::InvalidManifest(
+                    "`version` in [package] section is not a string".to_string(),
+                ));
+            }
+        };
+
+        let package = Package {
+            key: package_key.clone(),
+            package: None,
+            name: package_key.replace("-", "_"),
+            version: package_version.clone(),
+        };
+
+        Ok(package)
+    }
 }
 
 fn manifest_path() -> Result<PathBuf> {
@@ -377,6 +435,8 @@ where
 pub enum Error {
     /// `CARGO_MANIFEST_DIR` environment variable not found.
     NotFoundManifestDir,
+    /// The manifest is invalid for the following reason.
+    InvalidManifest(String),
     /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
     ///
     /// [`find_crate()`]: fn.find_crate.html
@@ -392,6 +452,9 @@ impl fmt::Display for Error {
         match self {
             Error::NotFoundManifestDir => {
                 write!(f, "`{}` environment variable not found", MANIFEST_DIR)
+            }
+            Error::InvalidManifest(reason) => {
+                write!(f, "The manifest is invalid because: {}", reason)
             }
             Error::NotFound => {
                 write!(f, "the crate with the specified name not found in dependencies")
