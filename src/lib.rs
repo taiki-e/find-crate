@@ -93,15 +93,19 @@
 // mem::take and #[non_exhaustive] requires Rust 1.40
 #![allow(clippy::mem_replace_with_default, clippy::manual_non_exhaustive)]
 
+mod error;
+
 use std::{
-    env, fmt,
+    env,
     fs::File,
-    io::{self, Read},
+    io::Read,
     path::{Path, PathBuf},
 };
 use toml::value::{Table, Value};
 
-type Result<T> = std::result::Result<T, Error>;
+pub use crate::error::Error;
+
+type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// `CARGO_MANIFEST_DIR` environment variable.
 const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
@@ -415,67 +419,4 @@ where
             None
         }
     })
-}
-
-// =================================================================================================
-// Error
-
-/// An error that occurred when getting manifest.
-#[derive(Debug)]
-pub enum Error {
-    /// `CARGO_MANIFEST_DIR` environment variable not found.
-    NotFoundManifestDir,
-    /// The manifest is invalid for the following reason.
-    InvalidManifest(String),
-    /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
-    ///
-    /// [`find_crate()`]: fn.find_crate.html
-    NotFound,
-    /// An error occurred while to open or to read the manifest file.
-    Io(io::Error),
-    /// An error occurred while to parse the manifest file.
-    Toml(toml::de::Error),
-    #[doc(hidden)]
-    __Nonexhaustive,
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::NotFoundManifestDir => {
-                write!(f, "`{}` environment variable not found", MANIFEST_DIR)
-            }
-            Error::InvalidManifest(reason) => {
-                write!(f, "The manifest is invalid because: {}", reason)
-            }
-            Error::NotFound => {
-                write!(f, "the crate with the specified name not found in dependencies")
-            }
-            Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
-            Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
-            Error::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
-
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Error::Io(e) => Some(e),
-            Error::Toml(e) => Some(e),
-            _ => None,
-        }
-    }
-}
-
-impl From<io::Error> for Error {
-    fn from(e: io::Error) -> Self {
-        Error::Io(e)
-    }
-}
-
-impl From<toml::de::Error> for Error {
-    fn from(e: toml::de::Error) -> Self {
-        Error::Toml(e)
-    }
 }
