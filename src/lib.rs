@@ -435,6 +435,8 @@ pub enum Error {
     Io(io::Error),
     /// An error occurred while to parse the manifest file.
     Toml(toml::de::Error),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl fmt::Display for Error {
@@ -451,6 +453,7 @@ impl fmt::Display for Error {
             }
             Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
             Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
+            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
