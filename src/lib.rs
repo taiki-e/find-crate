@@ -324,33 +324,23 @@ impl Manifest {
             Error::InvalidManifest("[package] section is missing `name`".to_string())
         })?;
 
-        let package_key = match package_key_value {
-            Value::String(name) => name,
-            _ => {
-                return Err(Error::InvalidManifest(
-                    "`name` in [package] section is not a string".to_string(),
-                ));
-            }
-        };
+        let package_key = package_key_value.as_str().ok_or_else(|| {
+            Error::InvalidManifest("`name` in [package] section is not a string".to_string())
+        })?;
 
         let package_version_value = package_section.get("version").ok_or_else(|| {
             Error::InvalidManifest("[package] section is missing `version`".to_string())
         })?;
 
-        let package_version = match package_version_value {
-            Value::String(version) => version,
-            _ => {
-                return Err(Error::InvalidManifest(
-                    "`version` in [package] section is not a string".to_string(),
-                ));
-            }
-        };
+        let package_version = package_version_value.as_str().ok_or_else(|| {
+            Error::InvalidManifest("`version` in [package] section is not a string".to_string())
+        })?;
 
         let package = Package {
-            key: package_key.clone(),
+            key: package_key.to_string(),
             package: None,
             name: package_key.replace("-", "_"),
-            version: package_version.clone(),
+            version: package_version.to_string(),
         };
 
         Ok(package)
