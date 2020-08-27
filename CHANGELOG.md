@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.6.0] - 2020-08-27
+
+* Add `Manifest::crate_package`.
+
+* Make `Error` non-exhaustive.
+
 ## [0.5.0] - 2019-09-29
 
 * Made `Manifest::dependencies` and `Package::{name, varsion}` fields public.
@@ -48,7 +54,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/taiki-e/find-crate/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/taiki-e/find-crate/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/taiki-e/find-crate/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/taiki-e/find-crate/compare/v0.2.0...v0.3.0
