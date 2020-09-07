@@ -94,7 +94,7 @@ fn imports() -> TokenStream {
 ```
 
 By default it will be searched from `dependencies` and `dev-dependencies`.
-Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in [`CARGO_MANIFEST_DIR`] as manifest.
 
 ## Alternatives
 
@@ -108,6 +108,7 @@ for multiple crate names and versions. For general purposes,
 [`Manifest::new`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html#method.new
 [`Manifest`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html
 [`find_crate`]: https://docs.rs/find-crate/0.6/find_crate/fn.find_crate.html
+[`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
 [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 

@@ -68,7 +68,7 @@
 //! ```
 //!
 //! By default it will be searched from `dependencies` and `dev-dependencies`.
-//! Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+//! Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in [`CARGO_MANIFEST_DIR`] as manifest.
 //!
 //! # Alternatives
 //!
@@ -79,6 +79,7 @@
 //! for multiple crate names and versions. For general purposes,
 //! [proc-macro-crate], which provides a simpler API, may be easier to use.
 //!
+//! [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
 //! [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 //! [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
@@ -117,12 +118,14 @@ pub use crate::error::Error;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
 
-/// The `CARGO_MANIFEST_DIR` environment variable.
+/// The [`CARGO_MANIFEST_DIR`] environment variable.
+///
+/// [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
 const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 
 /// Find the crate name from the current `Cargo.toml`.
 ///
-/// This function reads `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+/// This function reads `Cargo.toml` in [`CARGO_MANIFEST_DIR`] as manifest.
 ///
 /// Note that this function needs to be used in the context of proc-macro.
 ///
@@ -140,6 +143,8 @@ const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 ///     quote!(extern crate #name as _foo;)
 /// }
 /// ```
+///
+/// [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
 pub fn find_crate<P>(predicate: P) -> Result<Package>
 where
     P: FnMut(&str) -> bool,
@@ -228,7 +233,9 @@ pub struct Manifest {
 impl Manifest {
     /// Constructs a new `Manifest` from the current `Cargo.toml`.
     ///
-    /// This function reads `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+    /// This function reads `Cargo.toml` in [`CARGO_MANIFEST_DIR`] as manifest.
+    ///
+    /// [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
     pub fn new() -> Result<Self> {
         Self::from_path(&manifest_path()?)
     }

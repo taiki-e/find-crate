@@ -13,9 +13,9 @@ pub enum Error {
     /// The manifest is invalid for the following reason.
     InvalidManifest(String),
 
-    /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
+    /// The crate with the specified name not found. This error occurs only from [`find_crate`].
     ///
-    /// [`find_crate()`]: super::find_crate
+    /// [`find_crate`]: super::find_crate
     NotFound,
 
     /// An error occurred while to open or to read the manifest file.
