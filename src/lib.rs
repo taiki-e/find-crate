@@ -83,7 +83,7 @@
 //! [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 //! [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
-#![doc(html_root_url = "https://docs.rs/find-crate/0.6.0")]
+#![doc(html_root_url = "https://docs.rs/find-crate/0.6.1")]
 #![doc(test(
     no_crate_inject,
     attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))
