@@ -111,7 +111,7 @@ pub use crate::error::Error;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
 
-/// `CARGO_MANIFEST_DIR` environment variable.
+/// The `CARGO_MANIFEST_DIR` environment variable.
 const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 
 /// Find the crate name from the current `Cargo.toml`.

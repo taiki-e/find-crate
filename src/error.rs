@@ -5,18 +5,25 @@ use crate::MANIFEST_DIR;
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
 pub enum Error {
-    /// `CARGO_MANIFEST_DIR` environment variable not found.
+    /// The [`CARGO_MANIFEST_DIR`] environment variable not found.
+    ///
+    /// [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
     NotFoundManifestDir,
+
     /// The manifest is invalid for the following reason.
     InvalidManifest(String),
+
     /// The crate with the specified name not found. This error occurs only from [`find_crate()`].
     ///
-    /// [`find_crate()`]: fn.find_crate.html
+    /// [`find_crate()`]: super::find_crate
     NotFound,
+
     /// An error occurred while to open or to read the manifest file.
     Io(io::Error),
+
     /// An error occurred while to parse the manifest file.
     Toml(toml::de::Error),
+
     #[doc(hidden)]
     __Nonexhaustive,
 }
