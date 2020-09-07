@@ -5,15 +5,9 @@
 //! name of the crate you want to use, you can do the same thing as `$crate`.
 //! This crate provides the features to make it easy.
 //!
-//! Note: This crate is intended to provide more powerful features such as
-//! support for multiple crate names and versions. For general purposes,
-//! [proc-macro-crate], which provides a simpler API, may be easier to use.
-//!
-//! [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
-//!
 //! # Examples
 //!
-//! [`find_crate()`] gets the crate name from `Cargo.toml`.
+//! [`find_crate`] gets the crate name from the current `Cargo.toml`.
 //!
 //! ```rust
 //! use find_crate::find_crate;
@@ -45,7 +39,7 @@
 //! ```
 //!
 //! Using [`Manifest`] to search for multiple crates. It is much more efficient
-//! than using `find_crate()` for each crate.
+//! than using [`find_crate`] for each crate.
 //!
 //! ```rust
 //! use find_crate::Manifest;
@@ -74,7 +68,19 @@
 //! ```
 //!
 //! By default it will be searched from `dependencies` and `dev-dependencies`.
-//! Also, [`find_crate()`] and [`Manifest::new()`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+//! Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+//!
+//! # Alternatives
+//!
+//! If you write function-like procedural macros, [you can combine it with
+//! declarative macros to support both crate renaming and macro re-exporting.][rust-lang/futures-rs#2124]
+//!
+//! This crate is intended to provide more powerful features such as support
+//! for multiple crate names and versions. For general purposes,
+//! [proc-macro-crate], which provides a simpler API, may be easier to use.
+//!
+//! [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
+//! [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
 #![doc(html_root_url = "https://docs.rs/find-crate/0.6.0")]
 #![doc(test(
@@ -118,7 +124,7 @@ const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 ///
 /// This function reads `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
 ///
-/// Note that this function needs to be used in the context of procedural macros.
+/// Note that this function needs to be used in the context of proc-macro.
 ///
 /// # Examples
 ///
@@ -210,7 +216,7 @@ impl Package {
 
 /// The manifest of cargo.
 ///
-/// Note that this function needs to be used in the context of procedural macros.
+/// Note that this function needs to be used in the context of proc-macro.
 #[derive(Debug, Clone)]
 pub struct Manifest {
     manifest: Table,

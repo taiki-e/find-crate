@@ -21,10 +21,6 @@ very useful, but procedural macros do not have this. If you know the current
 name of the crate you want to use, you can do the same thing as `$crate`.
 This crate provides the features to make it easy.
 
-Note: This crate is intended to provide more powerful features such as support for multiple crate names and versions. For general purposes, [proc-macro-crate], which provides a simpler API, may be easier to use.
-
-[proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
-
 ## Usage
 
 Add this to your `Cargo.toml`:
@@ -38,7 +34,7 @@ The current find-crate requires Rust 1.31 or later.
 
 ## Examples
 
-`find_crate()` gets the crate name from the current `Cargo.toml`.
+[`find_crate`] gets the crate name from the current `Cargo.toml`.
 
 ```rust
 use find_crate::find_crate;
@@ -68,7 +64,8 @@ fn import() -> TokenStream {
 }
 ```
 
-Using `Manifest` to search for multiple crates. It is much more efficient than using `find_crate()` for each crate.
+Using [`Manifest`] to search for multiple crates. It is much more efficient
+than using [`find_crate`] for each crate.
 
 ```rust
 use find_crate::Manifest;
@@ -97,7 +94,22 @@ fn imports() -> TokenStream {
 ```
 
 By default it will be searched from `dependencies` and `dev-dependencies`.
-Also, `find_crate()` and `Manifest::new()` read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in `CARGO_MANIFEST_DIR` as manifest.
+
+## Alternatives
+
+If you write function-like procedural macros, [you can combine it with
+declarative macros to support both crate renaming and macro re-exporting.][rust-lang/futures-rs#2124]
+
+This crate is intended to provide more powerful features such as support
+for multiple crate names and versions. For general purposes,
+[proc-macro-crate], which provides a simpler API, may be easier to use.
+
+[`Manifest::new`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html#method.new
+[`Manifest`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html
+[`find_crate`]: https://docs.rs/find-crate/0.6/find_crate/fn.find_crate.html
+[rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
+[proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
 ## License
 
