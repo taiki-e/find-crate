@@ -20,7 +20,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 [workspace]
 
 [dependencies]
-toml = "0.5.3"
+toml = "0.5.2"
 
 [dev-dependencies]
 proc-macro2 = "1.0"
