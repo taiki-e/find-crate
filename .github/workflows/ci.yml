@@ -36,7 +36,9 @@ jobs:
         run: ci/install-rust.sh ${{ matrix.rust }}
       - if: matrix.rust == 'nightly'
         run: cargo install cargo-hack
-      - run: cargo test
+      - run: cargo check
+      - if: matrix.rust != '1.31.0'
+        run: cargo test
       - if: matrix.rust == 'nightly'
         run: bash scripts/check-minimal-versions.sh
 
