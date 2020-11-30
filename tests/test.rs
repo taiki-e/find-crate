@@ -101,6 +101,10 @@ fn target() {
 
 #[test]
 fn find2() {
+    fn check(req: &str, version: &Version) -> bool {
+        VersionReq::parse(req).unwrap().matches(version)
+    }
+
     const MANIFEST: &str = r#"
         [dependencies]
         foo = "0.1"
@@ -115,10 +119,6 @@ fn find2() {
     let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
 
     let version = Version::parse("0.2.0").unwrap();
-
-    fn check(req: &str, version: &Version) -> bool {
-        VersionReq::parse(req).unwrap().matches(version)
-    }
 
     assert_eq!(None, manifest.find2(|s, v| s == NAME1 && check(v, &version)));
 
