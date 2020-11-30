@@ -228,7 +228,7 @@ pub struct Manifest {
 }
 
 impl Manifest {
-    /// Constructs a new `Manifest` from the current `Cargo.toml`.
+    /// Creates a new `Manifest` from the current `Cargo.toml`.
     ///
     /// This function reads `Cargo.toml` in [`CARGO_MANIFEST_DIR`] as manifest.
     ///
@@ -240,14 +240,14 @@ impl Manifest {
     // TODO: Should we support custom manifest paths?
     //       And what should we do if the file is not found?
     //       (should we use `CARGO_MANIFEST_DIR`? Or should we return an error?)
-    /// Constructs a new `Manifest` from the specified toml file.
+    /// Creates a new `Manifest` from the specified toml file.
     fn from_path(manifest_path: &Path) -> Result<Self> {
         let mut bytes = Vec::new();
         File::open(manifest_path)?.read_to_end(&mut bytes)?;
         toml::from_slice(&bytes).map_err(Into::into).map(Self::from_toml)
     }
 
-    /// Constructs a new `Manifest` from a toml table.
+    /// Creates a new `Manifest` from a toml table.
     pub fn from_toml(manifest: Table) -> Self {
         Self { manifest, dependencies: Dependencies::default() }
     }
