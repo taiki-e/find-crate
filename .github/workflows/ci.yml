@@ -37,7 +37,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
       - if: startsWith(matrix.rust, 'nightly')
         run: cargo install cargo-hack
-      - run: cargo check
+      - run: cargo build
       - if: matrix.rust != '1.31.0'
         run: cargo test --all
       - if: startsWith(matrix.rust, 'nightly')
