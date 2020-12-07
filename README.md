@@ -41,7 +41,8 @@ fn import() -> TokenStream {
 }
 ```
 
-As in this example, it is easy to handle cases where proc-macro is exported from multiple crates.
+As in this example, it is easy to handle cases where proc-macro is exported
+from multiple crates.
 
 ```rust
 use find_crate::find_crate;
@@ -86,12 +87,14 @@ fn imports() -> TokenStream {
 ```
 
 By default it will be searched from `dependencies` and `dev-dependencies`.
-Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in [`CARGO_MANIFEST_DIR`] as manifest.
+Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in
+[`CARGO_MANIFEST_DIR`] as manifest.
 
 ## Alternatives
 
 If you write function-like procedural macros, [you can combine it with
-declarative macros to support both crate renaming and macro re-exporting.][rust-lang/futures-rs#2124]
+declarative macros to support both crate renaming and macro
+re-exporting.][rust-lang/futures-rs#2124]
 
 This crate is intended to provide more powerful features such as support
 for multiple crate names and versions. For general purposes,
@@ -106,6 +109,9 @@ for multiple crate names and versions. For general purposes,
 
 ## License
 
-Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
+[MIT license](LICENSE-MIT) at your option.
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
