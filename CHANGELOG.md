@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.6.2] - 2020-12-29
+
+- Documentation improvements.
+
 ## [0.6.1] - 2020-09-07
 
 - Documentation improvements.
@@ -58,7 +62,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.1...HEAD
+[unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/taiki-e/find-crate/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/taiki-e/find-crate/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/taiki-e/find-crate/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/taiki-e/find-crate/compare/v0.4.0...v0.5.0
