@@ -9,6 +9,7 @@ documentation = "https://docs.rs/find-crate"
 keywords = ["macros", "crate"]
 categories = ["development-tools::procedural-macro-helpers"]
 readme = "README.md"
+exclude = ["/.github", "/scripts"]
 description = """
 Find the crate name from the current Cargo.toml.
 """
