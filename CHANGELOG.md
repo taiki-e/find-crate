@@ -62,7 +62,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.2...HEAD
 [0.6.2]: https://github.com/taiki-e/find-crate/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/taiki-e/find-crate/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/taiki-e/find-crate/compare/v0.5.0...v0.6.0
