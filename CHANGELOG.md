@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org).
 
+<!--
+Note: In this file, do not use the hard wrap in the middle of a sentence for compatibility with GitHub comment style markdown rendering.
+-->
+
 ## [Unreleased]
+
+## [0.6.3] - 2021-01-05
+
+- Exclude unneeded files from crates.io.
 
 ## [0.6.2] - 2020-12-29
 
@@ -62,7 +70,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/taiki-e/find-crate/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/taiki-e/find-crate/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/taiki-e/find-crate/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/taiki-e/find-crate/compare/v0.5.0...v0.6.0
