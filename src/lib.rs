@@ -430,3 +430,25 @@ where
         }
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    use static_assertions::assert_impl_all as assert_impl;
+
+    assert_impl!(Manifest: Send);
+    assert_impl!(Manifest: Sync);
+    assert_impl!(Manifest: Unpin);
+
+    assert_impl!(Package: Send);
+    assert_impl!(Package: Sync);
+    assert_impl!(Package: Unpin);
+
+    assert_impl!(Dependencies: Send);
+    assert_impl!(Dependencies: Sync);
+    assert_impl!(Dependencies: Unpin);
+
+    assert_impl!(Error: Send);
+    assert_impl!(Error: Sync);
+    assert_impl!(Error: Unpin);
+}
