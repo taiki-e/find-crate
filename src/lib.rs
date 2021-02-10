@@ -105,6 +105,7 @@ use std::{
     io::Read,
     path::{Path, PathBuf},
 };
+
 use toml::value::{Table, Value};
 
 pub use crate::error::Error;
@@ -433,8 +434,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use static_assertions::assert_impl_all as assert_impl;
+
+    use crate::*;
 
     assert_impl!(Manifest: Send);
     assert_impl!(Manifest: Sync);
