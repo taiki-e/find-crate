@@ -26,7 +26,7 @@ find-crate = "0.5"
 
 ## Examples
 
-[`find_crate`] gets the crate name from the current `Cargo.toml`.
+[`find_crate`] function gets the crate name from the current `Cargo.toml`.
 
 ```rust
 use find_crate::find_crate;
@@ -34,7 +34,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 fn import() -> TokenStream {
-    let name = find_crate(|s| s == "foo").unwrap().name;
+    let name = find_crate(|name| name == "foo").unwrap().unwrap();
     let name = Ident::new(&name, Span::call_site());
     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
@@ -50,7 +50,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 fn import() -> TokenStream {
-    let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap().name;
+    let name = find_crate(|name| name == "foo" || name == "foo-core").unwrap().unwrap();
     let name = Ident::new(&name, Span::call_site());
     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
@@ -58,7 +58,7 @@ fn import() -> TokenStream {
 ```
 
 Using [`Manifest`] to search for multiple crates. It is much more efficient
-than using [`find_crate`] for each crate.
+than using [`find_crate`] function for each crate.
 
 ```rust
 use find_crate::Manifest;
@@ -72,22 +72,24 @@ const CRATE_NAMES: &[&[&str]] = &[
 ];
 
 fn imports() -> TokenStream {
-    let mut tts = TokenStream::new();
+    let mut tokens = TokenStream::new();
     let manifest = Manifest::new().unwrap();
 
     for names in CRATE_NAMES {
-        let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
+        let name = manifest.find(|name| names.iter().any(|x| name == *x)).unwrap();
         let name = Ident::new(&name, Span::call_site());
         let import_name = format_ident!("_{}", names[0]);
         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
-        tts.extend(quote!(extern crate #name as #import_name;));
+        tokens.extend(quote!(extern crate #name as #import_name;));
     }
-    tts
+    tokens
 }
 ```
 
 By default it will be searched from `dependencies` and `dev-dependencies`.
-Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in
+This behavior can be adjusted by changing the [`Manifest::dependencies`] field.
+
+[`find_crate`] and [`Manifest::new`] functions read `Cargo.toml` in
 [`CARGO_MANIFEST_DIR`] as manifest.
 
 ## Alternatives
@@ -100,12 +102,12 @@ This crate is intended to provide more powerful features such as support
 for multiple crate names and versions. For general purposes,
 [proc-macro-crate], which provides a simpler API, may be easier to use.
 
+[`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
+[proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
+[rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 [`Manifest::new`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html#method.new
 [`Manifest`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html
 [`find_crate`]: https://docs.rs/find-crate/0.6/find_crate/fn.find_crate.html
-[`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
-[rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
-[proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
 ## License
 
