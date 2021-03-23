@@ -19,7 +19,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-find-crate = "0.5"
+find-crate = "0.6"
 ```
 
 *Compiler support: requires rustc 1.31+*
