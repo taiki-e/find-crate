@@ -8,7 +8,7 @@ repository = "https://github.com/taiki-e/find-crate"
 documentation = "https://docs.rs/find-crate"
 keywords = ["macros", "crate"]
 categories = ["development-tools::procedural-macro-helpers"]
-exclude = ["/.*", "/scripts"]
+exclude = ["/.*", "/tools"]
 description = """
 Find the crate name from the current Cargo.toml.
 """
