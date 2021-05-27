@@ -26,4 +26,4 @@ toml = "0.5.2"
 [dev-dependencies]
 proc-macro2 = "1"
 quote = "1"
-semver = "0.11"
+semver = "1.0"
