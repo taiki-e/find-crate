@@ -278,7 +278,6 @@ impl Manifest {
     ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
-    #[inline]
     pub fn find<P>(&self, mut predicate: P) -> Option<Package>
     where
         P: FnMut(&str) -> bool,
@@ -315,7 +314,6 @@ impl Manifest {
     ///     quote!(extern crate #name as _foo;)
     /// }
     /// ```
-    #[inline]
     pub fn find2<P>(&self, predicate: P) -> Option<Package>
     where
         P: FnMut(&str, &str) -> bool,
