@@ -361,7 +361,7 @@ impl Manifest {
         let package = Package {
             key: package_key.to_string(),
             package: None,
-            name: package_key.replace("-", "_"),
+            name: package_key.replace('-', "_"),
             version: package_version.to_string(),
         };
 
@@ -431,7 +431,7 @@ where
         if package.is_some() || predicate(key, version) {
             Some(Package {
                 key: key.clone(),
-                name: key.replace("-", "_"),
+                name: key.replace('-', "_"),
                 version: version.to_string(),
                 package,
             })
