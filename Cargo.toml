@@ -2,7 +2,7 @@
 name = "find-crate"
 version = "0.6.3"
 edition = "2018"
-rust-version = "1.31"
+rust-version = "1.36"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/find-crate"
 keywords = ["macros", "crate"]
