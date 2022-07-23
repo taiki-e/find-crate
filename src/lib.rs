@@ -100,7 +100,8 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::default_trait_access, clippy::wildcard_imports)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::missing_errors_doc, clippy::must_use_candidate)]
 
 #[cfg(test)]
 #[rustfmt::skip]
