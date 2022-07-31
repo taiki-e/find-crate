@@ -4,6 +4,7 @@ use crate::MANIFEST_DIR;
 
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
+#[allow(clippy::exhaustive_enums)] // TODO: replace manual non_exhaustive with real #[non_exhaustive] once we bump MSRV to 1.40.
 pub enum Error {
     /// The [`CARGO_MANIFEST_DIR`] environment variable not found.
     ///

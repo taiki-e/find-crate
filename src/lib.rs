@@ -100,7 +100,7 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::pedantic)]
+#![warn(clippy::exhaustive_enums, clippy::exhaustive_structs, clippy::pedantic)]
 #![allow(clippy::missing_errors_doc, clippy::must_use_candidate)]
 
 #[cfg(test)]
@@ -158,6 +158,7 @@ where
 }
 
 /// The kind of dependencies to be searched.
+#[allow(clippy::exhaustive_enums)] // TODO
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Dependencies {
     /// Search from `dependencies` and `dev-dependencies`.
