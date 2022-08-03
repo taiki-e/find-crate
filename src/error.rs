@@ -1,4 +1,5 @@
-use std::{fmt, io};
+use core::fmt;
+use std::io;
 
 use crate::MANIFEST_DIR;
 

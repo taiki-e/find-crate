@@ -100,7 +100,15 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::exhaustive_enums, clippy::exhaustive_structs, clippy::pedantic)]
+#![warn(
+    clippy::pedantic,
+    // lints for public library
+    clippy::alloc_instead_of_core,
+    clippy::exhaustive_enums,
+    clippy::exhaustive_structs,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core,
+)]
 #![allow(clippy::missing_errors_doc, clippy::must_use_candidate)]
 
 #[cfg(test)]
@@ -121,7 +129,7 @@ use toml::value::{Table, Value};
 
 pub use crate::error::Error;
 
-type Result<T, E = Error> = std::result::Result<T, E>;
+type Result<T, E = Error> = core::result::Result<T, E>;
 
 /// The [`CARGO_MANIFEST_DIR`] environment variable.
 ///
