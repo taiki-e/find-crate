@@ -112,7 +112,6 @@
 #![allow(clippy::missing_errors_doc, clippy::must_use_candidate)]
 
 #[cfg(test)]
-#[rustfmt::skip]
 #[path = "gen/assert_impl.rs"]
 mod assert_impl;
 
