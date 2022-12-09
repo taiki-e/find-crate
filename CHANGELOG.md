@@ -30,7 +30,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.5.0] - 2019-09-29
 
-- Made `Manifest::dependencies` and `Package::{name, varsion}` fields public.
+- Made `Manifest::dependencies` and `Package::{name, version}` fields public.
 
 - Added support for `target.cfg.dependencies`.
 
