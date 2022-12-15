@@ -5,7 +5,7 @@ use crate::MANIFEST_DIR;
 
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
-#[allow(clippy::exhaustive_enums)] // TODO: replace manual non_exhaustive with real #[non_exhaustive] once we bump MSRV to 1.40.
+#[non_exhaustive]
 pub enum Error {
     /// The [`CARGO_MANIFEST_DIR`] environment variable not found.
     ///
@@ -25,9 +25,6 @@ pub enum Error {
 
     /// An error occurred while to parse the manifest file.
     Toml(toml::de::Error),
-
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl fmt::Display for Error {
@@ -44,7 +41,6 @@ impl fmt::Display for Error {
             }
             Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
             Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

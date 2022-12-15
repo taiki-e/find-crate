@@ -2,8 +2,6 @@
 // It is not intended for manual editing.
 
 anyhow
-crate
-find
 macro
 prettyplease
 proc
