@@ -18,6 +18,9 @@ targets = ["x86_64-unknown-linux-gnu"]
 [workspace]
 members = ["tools/codegen"]
 
+[lib]
+doc-scrape-examples = false
+
 # NB: toml is public dependencies.
 [dependencies]
 toml = "0.5.2"
