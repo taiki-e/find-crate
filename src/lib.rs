@@ -6,7 +6,7 @@ very useful, but procedural macros do not have this. If you know the current
 name of the crate you want to use, you can do the same thing as `$crate`.
 This crate provides the features to make it easy.
 
-# Examples
+## Examples
 
 [`find_crate`] gets the crate name from the current `Cargo.toml`.
 
@@ -72,7 +72,7 @@ By default it will be searched from `dependencies` and `dev-dependencies`.
 Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in
 [`CARGO_MANIFEST_DIR`] as manifest.
 
-# Alternatives
+## Alternatives
 
 If you write function-like procedural macros, [you can combine it with
 declarative macros to support both crate renaming and macro
