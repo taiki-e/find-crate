@@ -2,10 +2,10 @@
 // It is not intended for manual editing.
 
 anyhow
+ignore
 macro
 prettyplease
 proc
 quote
 semver
 toml
-walkdir
