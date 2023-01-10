@@ -2,10 +2,12 @@
 // It is not intended for manual editing.
 
 anyhow
+assertions
 ignore
 macro
 prettyplease
 proc
 quote
 semver
+static
 toml

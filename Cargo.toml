@@ -21,7 +21,7 @@ members = ["tools/codegen"]
 [lib]
 doc-scrape-examples = false
 
-# NB: toml is public dependencies.
+# Note: toml is public dependencies.
 [dependencies]
 toml = "0.5.2"
 
@@ -29,3 +29,4 @@ toml = "0.5.2"
 proc-macro2 = "1"
 quote = "1"
 semver = "1"
+static_assertions = "1"
