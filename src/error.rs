@@ -3,6 +3,8 @@ use std::io;
 
 use crate::MANIFEST_DIR;
 
+// TODO: Hide error variants from a library's public error type to prevent
+// dependency updates from becoming breaking changes.
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
 #[non_exhaustive]
