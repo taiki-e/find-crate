@@ -33,16 +33,16 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::NotFoundManifestDir => {
-                write!(f, "`{}` environment variable not found", MANIFEST_DIR)
+                write!(f, "`{MANIFEST_DIR}` environment variable not found")
             }
             Error::InvalidManifest(reason) => {
-                write!(f, "The manifest is invalid because: {}", reason)
+                write!(f, "The manifest is invalid because: {reason}")
             }
             Error::NotFound => {
                 write!(f, "the crate with the specified name not found in dependencies")
             }
-            Error::Io(e) => write!(f, "an error occurred while to open or to read: {}", e),
-            Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {}", e),
+            Error::Io(e) => write!(f, "an error occurred while to open or to read: {e}"),
+            Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {e}"),
         }
     }
 }

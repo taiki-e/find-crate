@@ -45,8 +45,7 @@ pub fn write(function_name: &str, path: &Path, contents: TokenStream) -> Result<
 
 fn format_tokens(contents: TokenStream) -> Vec<u8> {
     let mut out = prettyplease::unparse(
-        &syn::parse2(contents.clone())
-            .unwrap_or_else(|e| panic!("{} in:\n---\n{}\n---", e, contents)),
+        &syn::parse2(contents.clone()).unwrap_or_else(|e| panic!("{e} in:\n---\n{contents}\n---")),
     )
     .into_bytes();
     format_macros(&mut out);
