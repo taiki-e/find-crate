@@ -23,7 +23,7 @@ doc-scrape-examples = false
 
 # Note: toml is public dependencies.
 [dependencies]
-toml = "0.5.2"
+toml = "0.6"
 
 [dev-dependencies]
 proc-macro2 = "1"

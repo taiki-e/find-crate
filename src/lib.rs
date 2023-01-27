@@ -125,9 +125,7 @@ mod assert_impl;
 mod error;
 
 use std::{
-    env,
-    fs::File,
-    io::Read,
+    env, fs,
     path::{Path, PathBuf},
 };
 
@@ -265,9 +263,7 @@ impl Manifest {
     //       (should we use `CARGO_MANIFEST_DIR`? Or should we return an error?)
     /// Creates a new `Manifest` from the specified toml file.
     fn from_path(manifest_path: &Path) -> Result<Self> {
-        let mut bytes = Vec::new();
-        File::open(manifest_path)?.read_to_end(&mut bytes)?;
-        toml::from_slice(&bytes).map_err(Into::into).map(Self::from_toml)
+        toml::from_str(&fs::read_to_string(manifest_path)?).map_err(Into::into).map(Self::from_toml)
     }
 
     /// Creates a new `Manifest` from a toml table.
