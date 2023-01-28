@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `toml` dependency to 0.7.
+
 ## [0.6.3] - 2021-01-05
 
 - Exclude unneeded files from crates.io.
