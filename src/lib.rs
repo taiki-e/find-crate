@@ -170,8 +170,8 @@ where
 }
 
 /// The kind of dependencies to be searched.
-#[allow(clippy::exhaustive_enums)] // TODO: add non_exhaustive in next breaking release
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Dependencies {
     /// Search from `dependencies` and `dev-dependencies`.
     Default,

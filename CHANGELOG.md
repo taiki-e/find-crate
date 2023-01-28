@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Update `toml` dependency to 0.7.
 
+- Make `Dependencies` enum `#[non_exhaustive]`.
+
 ## [0.6.3] - 2021-01-05
 
 - Exclude unneeded files from crates.io.
