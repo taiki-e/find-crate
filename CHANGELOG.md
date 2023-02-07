@@ -10,9 +10,15 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Update `toml` dependency to 0.7.
+- Update `toml` to 0.7.
+
+- Remove `toml` crate from public dependencies. This makes future updates of toml crate not a breaking change.
 
 - Make `Dependencies` enum `#[non_exhaustive]`.
+
+- Add `Manifest::from_text`.
+
+- Remove `Manifest::from_toml` in favor of `Manifest::from_text`.
 
 ## [0.6.3] - 2021-01-05
 

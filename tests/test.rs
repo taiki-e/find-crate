@@ -20,7 +20,7 @@ fn dependencies() {
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
 
-    let mut manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let mut manifest = Manifest::from_text(MANIFEST).unwrap();
 
     assert_eq!(Dependencies::Default, manifest.dependencies);
 
@@ -61,7 +61,7 @@ fn renamed() {
     const NAME1: &str = "foo";
     const NAME2: &str = "bar";
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_text(MANIFEST).unwrap();
 
     assert_eq!("foo_renamed", manifest.find(|s| s == NAME1).unwrap().name);
     assert_eq!("0.1", manifest.find(|s| s == NAME1).unwrap().version);
@@ -87,7 +87,7 @@ fn target() {
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_text(MANIFEST).unwrap();
 
     assert_eq!(NAME1, manifest.find(|s| s == NAME1).unwrap().name);
     assert_eq!("0.1", manifest.find(|s| s == NAME1).unwrap().version);
@@ -116,7 +116,7 @@ fn find2() {
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_text(MANIFEST).unwrap();
 
     let version = Version::parse("0.2.0").unwrap();
 
@@ -137,7 +137,7 @@ fn crate_name() {
     version = "0.1.0"
     "#;
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_text(MANIFEST).unwrap();
     let package = manifest.crate_package().unwrap();
     assert_eq!("crate_name", package.name);
     assert_eq!("0.1.0", package.version);

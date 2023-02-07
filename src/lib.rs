@@ -129,11 +129,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use error::Context;
 use toml::value::{Table, Value};
 
 pub use crate::error::Error;
-
-type Result<T, E = Error> = core::result::Result<T, E>;
+use crate::error::{ErrorKind, Result};
 
 /// The [`CARGO_MANIFEST_DIR`] environment variable.
 ///
@@ -166,7 +166,7 @@ pub fn find_crate<P>(predicate: P) -> Result<Package>
 where
     P: FnMut(&str) -> bool,
 {
-    Manifest::new()?.find(predicate).ok_or(Error::NotFound)
+    Manifest::new()?.find(predicate).ok_or_else(|| Error::new(ErrorKind::NotFound))
 }
 
 /// The kind of dependencies to be searched.
@@ -255,7 +255,7 @@ impl Manifest {
     ///
     /// [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
     pub fn new() -> Result<Self> {
-        Self::from_path(&manifest_path()?)
+        Self::from_path(&manifest_path().ok_or_else(|| Error::new(ErrorKind::NotFoundManifestDir))?)
     }
 
     // TODO: Should we support custom manifest paths?
@@ -263,12 +263,20 @@ impl Manifest {
     //       (should we use `CARGO_MANIFEST_DIR`? Or should we return an error?)
     /// Creates a new `Manifest` from the specified toml file.
     fn from_path(manifest_path: &Path) -> Result<Self> {
-        toml::from_str(&fs::read_to_string(manifest_path)?).map_err(Into::into).map(Self::from_toml)
+        Self::from_text(
+            &fs::read_to_string(manifest_path).with_context(|| {
+                format!("failed to read manifest `{}`", manifest_path.display())
+            })?,
+        )
+        .with_context(|| format!("failed to parse manifest `{}` as TOML", manifest_path.display()))
     }
 
-    /// Creates a new `Manifest` from a toml table.
-    pub fn from_toml(manifest: Table) -> Self {
-        Self { manifest, dependencies: Dependencies::default() }
+    /// Creates a new `Manifest` from a toml text.
+    pub fn from_text(s: &str) -> Result<Self> {
+        Ok(Self {
+            manifest: toml::from_str(s).map_err(Error::new)?,
+            dependencies: Dependencies::default(),
+        })
     }
 
     /// Find the crate.
@@ -350,25 +358,32 @@ impl Manifest {
     /// }
     /// ```
     pub fn crate_package(&self) -> Result<Package> {
-        let package_section = self
-            .manifest
-            .get("package")
-            .ok_or_else(|| Error::InvalidManifest("[package] section is missing".to_string()))?;
+        let package_section = self.manifest.get("package").ok_or_else(|| {
+            Error::new(ErrorKind::InvalidManifest("[package] section is missing".to_string()))
+        })?;
 
         let package_key_value = package_section.get("name").ok_or_else(|| {
-            Error::InvalidManifest("[package] section is missing `name`".to_string())
+            Error::new(ErrorKind::InvalidManifest(
+                "[package] section is missing `name`".to_string(),
+            ))
         })?;
 
         let package_key = package_key_value.as_str().ok_or_else(|| {
-            Error::InvalidManifest("`name` in [package] section is not a string".to_string())
+            Error::new(ErrorKind::InvalidManifest(
+                "`name` in [package] section is not a string".to_string(),
+            ))
         })?;
 
         let package_version_value = package_section.get("version").ok_or_else(|| {
-            Error::InvalidManifest("[package] section is missing `version`".to_string())
+            Error::new(ErrorKind::InvalidManifest(
+                "[package] section is missing `version`".to_string(),
+            ))
         })?;
 
         let package_version = package_version_value.as_str().ok_or_else(|| {
-            Error::InvalidManifest("`version` in [package] section is not a string".to_string())
+            Error::new(ErrorKind::InvalidManifest(
+                "`version` in [package] section is not a string".to_string(),
+            ))
         })?;
 
         let package = Package {
@@ -382,13 +397,11 @@ impl Manifest {
     }
 }
 
-fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR).ok_or(Error::NotFoundManifestDir).map(PathBuf::from).map(
-        |mut path| {
-            path.push("Cargo.toml");
-            path
-        },
-    )
+fn manifest_path() -> Option<PathBuf> {
+    env::var_os(MANIFEST_DIR).map(PathBuf::from).map(|mut path| {
+        path.push("Cargo.toml");
+        path
+    })
 }
 
 fn find<P>(manifest: &Table, dependencies: Dependencies, mut predicate: P) -> Option<Package>

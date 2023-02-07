@@ -21,7 +21,6 @@ members = ["tools/codegen"]
 [lib]
 doc-scrape-examples = false
 
-# Note: toml is public dependencies.
 [dependencies]
 toml = "0.7"
 
