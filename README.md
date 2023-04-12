@@ -6,6 +6,7 @@
 [![rustc](https://img.shields.io/badge/rustc-1.60+-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![build status](https://img.shields.io/github/actions/workflow/status/taiki-e/find-crate/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/find-crate/actions)
 
+<!-- tidy:crate-doc:start -->
 Find the crate name from the current `Cargo.toml`.
 
 When writing declarative macros, `$crate` representing the current crate is
@@ -100,12 +101,15 @@ This crate is intended to provide more powerful features such as support
 for multiple crate names and versions. For general purposes,
 [proc-macro-crate], which provides a simpler API, may be easier to use.
 
-[`Manifest::new`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html#method.new
-[`Manifest`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html
-[`find_crate`]: https://docs.rs/find-crate/0.6/find_crate/fn.find_crate.html
 [`CARGO_MANIFEST_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
 [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
+
+<!-- tidy:crate-doc:end -->
+
+[`Manifest::new`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html#method.new
+[`Manifest`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html
+[`find_crate`]: https://docs.rs/find-crate/0.6/find_crate/fn.find_crate.html
 
 ## License
 
