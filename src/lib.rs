@@ -179,10 +179,11 @@ where
 }
 
 /// The kind of dependencies to be searched.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Dependencies {
     /// Search from `dependencies` and `dev-dependencies`.
+    #[default]
     Default,
     /// Search from `dependencies`.
     Release,
@@ -203,12 +204,6 @@ impl Dependencies {
             Dependencies::Build => &["build-dependencies"],
             Dependencies::All => &["dependencies", "dev-dependencies", "build-dependencies"],
         }
-    }
-}
-
-impl Default for Dependencies {
-    fn default() -> Self {
-        Dependencies::Default
     }
 }
 
