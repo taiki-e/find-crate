@@ -2,7 +2,7 @@
 name = "find-crate"
 version = "0.6.3"
 edition = "2021"
-rust-version = "1.64"
+rust-version = "1.66"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/find-crate"
 keywords = ["macros", "crate"]
@@ -24,7 +24,7 @@ doc-scrape-examples = false
 
 # Note: toml is public dependencies.
 [dependencies]
-toml = "0.7"
+toml = { version = "0.7", default-features = false, features = ["parse"] }
 
 [dev-dependencies]
 proc-macro2 = "1"
