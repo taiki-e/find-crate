@@ -24,7 +24,7 @@ doc-scrape-examples = false
 
 # Note: toml is public dependencies.
 [dependencies]
-toml = { version = "0.7", default-features = false, features = ["parse"] }
+toml = { version = "0.8", default-features = false, features = ["parse"] }
 
 [dev-dependencies]
 proc-macro2 = "1"
