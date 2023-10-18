@@ -15,6 +15,12 @@ Find the crate name from the current Cargo.toml.
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
+[package.metadata.cargo_check_external_types]
+# The following are external types that are allowed to be exposed in our public API.
+allowed_external_types = [
+    "toml::*", # TODO: remove from public API
+]
+
 [workspace]
 resolver = "2"
 members = ["tools/codegen"]
