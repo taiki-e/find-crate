@@ -18,7 +18,7 @@ Add this to your `Cargo.toml`:
 find-crate = "0.6"
 ```
 
-*Compiler support: requires rustc 1.66+*
+*Compiler support: requires rustc 1.67+*
 
 ## Examples
 
