@@ -112,10 +112,6 @@ for multiple crate names and versions. For general purposes,
 ))]
 #![forbid(unsafe_code)]
 #![warn(
-    rust_2018_idioms,
-    single_use_lifetimes,
-    unreachable_pub,
-    clippy::pedantic,
     // Lints that may help when writing public library.
     missing_debug_implementations,
     missing_docs,
@@ -127,7 +123,7 @@ for multiple crate names and versions. For general purposes,
     // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
-#![allow(clippy::missing_errors_doc, clippy::must_use_candidate, clippy::struct_field_names)]
+#![allow(clippy::must_use_candidate, clippy::struct_field_names)]
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
