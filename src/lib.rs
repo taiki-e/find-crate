@@ -155,7 +155,7 @@ const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```
 /// use find_crate::find_crate;
 /// use proc_macro2::{Ident, Span, TokenStream};
 /// use quote::quote;
@@ -279,7 +279,7 @@ impl Manifest {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
@@ -306,7 +306,7 @@ impl Manifest {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
@@ -339,7 +339,7 @@ impl Manifest {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```
     /// use find_crate::Manifest;
     /// use proc_macro2::{Ident, Span, TokenStream};
     /// use quote::quote;
