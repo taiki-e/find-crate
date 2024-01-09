@@ -122,7 +122,7 @@ for multiple crate names and versions. For general purposes,
     // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
-#![allow(clippy::must_use_candidate, clippy::struct_field_names)]
+#![allow(clippy::must_use_candidate)]
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
