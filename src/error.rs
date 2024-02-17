@@ -41,7 +41,7 @@ impl fmt::Display for Error {
                 write!(f, "The manifest is invalid because: {reason}")
             }
             Error::NotFound => {
-                write!(f, "the crate with the specified name not found in dependencies")
+                f.write_str("the crate with the specified name not found in dependencies")
             }
             Error::Io(e) => write!(f, "an error occurred while to open or to read: {e}"),
             Error::Toml(e) => write!(f, "an error occurred while parsing the manifest file: {e}"),
