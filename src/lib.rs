@@ -123,7 +123,6 @@ for multiple crate names and versions. For general purposes,
     // clippy::std_instead_of_alloc,
     // clippy::std_instead_of_core,
 )]
-#![allow(clippy::must_use_candidate)]
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
@@ -226,6 +225,7 @@ pub struct Package {
 
 impl Package {
     /// Returns the original package name.
+    #[must_use]
     pub fn original_name(&self) -> &str {
         self.package.as_ref().unwrap_or(&self.key)
     }
@@ -234,6 +234,7 @@ impl Package {
     /// name.
     ///
     /// [`name`]: Package::name
+    #[must_use]
     pub fn is_original(&self) -> bool {
         self.package.is_none()
     }
@@ -269,6 +270,7 @@ impl Manifest {
     }
 
     /// Creates a new `Manifest` from a toml table.
+    #[must_use]
     pub fn from_toml(manifest: Table) -> Self {
         Self { manifest, dependencies: Dependencies::default() }
     }

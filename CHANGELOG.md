@@ -10,9 +10,11 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Update `toml` dependency to 0.7.
+- Update `toml` dependency to 0.8.
 
 - Make `Dependencies` enum `#[non_exhaustive]`.
+
+- Add `#[must_use]` to constructor and getters.
 
 ## [0.6.3] - 2021-01-05
 
