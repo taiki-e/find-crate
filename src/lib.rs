@@ -18,8 +18,6 @@ Add this to your `Cargo.toml`:
 find-crate = "0.6"
 ```
 
-*Compiler support: requires rustc 1.70+*
-
 ## Examples
 
 [`find_crate`] gets the crate name from the current `Cargo.toml`.
