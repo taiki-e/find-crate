@@ -105,9 +105,9 @@ for multiple crate names and versions. For general purposes,
 
 <!-- tidy:crate-doc:end -->
 
-[`Manifest::new`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html#method.new
-[`Manifest`]: https://docs.rs/find-crate/0.6/find_crate/struct.Manifest.html
-[`find_crate`]: https://docs.rs/find-crate/0.6/find_crate/fn.find_crate.html
+[`Manifest::new`]: https://docs.rs/find-crate/latest/find_crate/struct.Manifest.html#method.new
+[`Manifest`]: https://docs.rs/find-crate/latest/find_crate/struct.Manifest.html
+[`find_crate`]: https://docs.rs/find-crate/latest/find_crate/fn.find_crate.html
 
 ## License
 
