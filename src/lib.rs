@@ -355,29 +355,29 @@ impl Manifest {
         let package_section = self
             .manifest
             .get("package")
-            .ok_or_else(|| Error::InvalidManifest("[package] section is missing".to_string()))?;
+            .ok_or_else(|| Error::InvalidManifest("[package] section is missing".to_owned()))?;
 
         let package_key_value = package_section.get("name").ok_or_else(|| {
-            Error::InvalidManifest("[package] section is missing `name`".to_string())
+            Error::InvalidManifest("[package] section is missing `name`".to_owned())
         })?;
 
         let package_key = package_key_value.as_str().ok_or_else(|| {
-            Error::InvalidManifest("`name` in [package] section is not a string".to_string())
+            Error::InvalidManifest("`name` in [package] section is not a string".to_owned())
         })?;
 
         let package_version_value = package_section.get("version").ok_or_else(|| {
-            Error::InvalidManifest("[package] section is missing `version`".to_string())
+            Error::InvalidManifest("[package] section is missing `version`".to_owned())
         })?;
 
         let package_version = package_version_value.as_str().ok_or_else(|| {
-            Error::InvalidManifest("`version` in [package] section is not a string".to_string())
+            Error::InvalidManifest("`version` in [package] section is not a string".to_owned())
         })?;
 
         let package = Package {
-            key: package_key.to_string(),
+            key: package_key.to_owned(),
             package: None,
             name: package_key.replace('-', "_"),
-            version: package_version.to_string(),
+            version: package_version.to_owned(),
         };
 
         Ok(package)
@@ -429,7 +429,7 @@ where
     {
         value.as_table()?.get("package")?.as_str().and_then(|s| {
             if predicate(s, version) {
-                Some(s.to_string())
+                Some(s.to_owned())
             } else {
                 None
             }
@@ -447,7 +447,7 @@ where
             Some(Package {
                 key: key.clone(),
                 name: key.replace('-', "_"),
-                version: version.to_string(),
+                version: version.to_owned(),
                 package,
             })
         } else {
