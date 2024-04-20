@@ -141,4 +141,13 @@ fn crate_name() {
     let package = manifest.crate_package().unwrap();
     assert_eq!("crate_name", package.name);
     assert_eq!("0.1.0", package.version);
+
+    let manifest = r#"
+    [package]
+    name = "crate-name"
+    "#;
+    let manifest = Manifest::from_toml(toml::from_str(manifest).unwrap());
+    let package = manifest.crate_package().unwrap();
+    assert_eq!("crate_name", package.name);
+    assert_eq!("0.0.0", package.version);
 }

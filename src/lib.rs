@@ -365,13 +365,13 @@ impl Manifest {
             Error::InvalidManifest("`name` in [package] section is not a string".to_owned())
         })?;
 
-        let package_version_value = package_section.get("version").ok_or_else(|| {
-            Error::InvalidManifest("[package] section is missing `version`".to_owned())
-        })?;
-
-        let package_version = package_version_value.as_str().ok_or_else(|| {
-            Error::InvalidManifest("`version` in [package] section is not a string".to_owned())
-        })?;
+        let package_version = match package_section.get("version") {
+            Some(package_version_value) => package_version_value.as_str().ok_or_else(|| {
+                Error::InvalidManifest("`version` in [package] section is not a string".to_owned())
+            })?,
+            // Cargo supports version-less manifests: https://github.com/rust-lang/cargo/pull/12786
+            None => "0.0.0",
+        };
 
         let package = Package {
             key: package_key.to_owned(),
