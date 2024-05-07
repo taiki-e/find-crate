@@ -121,7 +121,6 @@ for multiple crate names and versions. For general purposes,
     // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
-#![cfg_attr(test, allow(unexpected_cfgs))] // https://github.com/rust-lang/rust/issues/124735
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
