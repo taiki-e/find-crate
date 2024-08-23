@@ -29,8 +29,8 @@ doc-scrape-examples = false
 toml = { version = "0.8", default-features = false, features = ["parse"] }
 
 [dev-dependencies]
-proc-macro2 = "1"
-quote = "1"
+proc-macro2 = { version = "1", default-features = false }
+quote = { version = "1", default-features = false }
 semver = "1"
 static_assertions = "1"
 
