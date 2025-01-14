@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/find-crate?style=flat-square&logo=rust)](https://crates.io/crates/find-crate)
 [![docs.rs](https://img.shields.io/badge/docs.rs-find--crate-blue?style=flat-square&logo=docs.rs)](https://docs.rs/find-crate)
 [![license](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue?style=flat-square)](#license)
-[![msrv](https://img.shields.io/badge/msrv-1.70-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
+[![msrv](https://img.shields.io/badge/msrv-1.65-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![github actions](https://img.shields.io/github/actions/workflow/status/taiki-e/find-crate/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/find-crate/actions)
 
 <!-- tidy:crate-doc:start -->
