@@ -123,7 +123,7 @@ for multiple crate names and versions. For general purposes,
 )]
 
 #[cfg(test)]
-#[path = "gen/assert_impl.rs"]
+#[path = "gen/tests/assert_impl.rs"]
 mod assert_impl;
 
 mod error;
