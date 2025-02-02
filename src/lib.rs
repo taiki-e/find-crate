@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 /*!
-<!-- tidy:crate-doc:start -->
+<!-- Note: Document from sync-markdown-to-rustdoc:start through sync-markdown-to-rustdoc:end
+     is synchronized from README.md. Any changes to that range are not preserved. -->
+<!-- tidy:sync-markdown-to-rustdoc:start -->
+
 Find the crate name from the current `Cargo.toml`.
 
 When writing declarative macros, `$crate` representing the current crate is
@@ -22,7 +25,7 @@ find-crate = "0.6"
 
 [`find_crate`] gets the crate name from the current `Cargo.toml`.
 
-```rust
+```
 use find_crate::find_crate;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
@@ -38,7 +41,7 @@ fn import() -> TokenStream {
 As in this example, it is easy to handle cases where proc-macro is exported
 from multiple crates.
 
-```rust
+```
 use find_crate::find_crate;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
@@ -54,7 +57,7 @@ fn import() -> TokenStream {
 Using [`Manifest`] to search for multiple crates. It is much more efficient
 than using [`find_crate`] for each crate.
 
-```rust
+```
 use find_crate::Manifest;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote};
@@ -98,7 +101,7 @@ for multiple crate names and versions. For general purposes,
 [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
-<!-- tidy:crate-doc:end -->
+<!-- tidy:sync-markdown-to-rustdoc:end -->
 */
 
 #![doc(test(

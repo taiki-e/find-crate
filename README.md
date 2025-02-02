@@ -6,7 +6,8 @@
 [![msrv](https://img.shields.io/badge/msrv-1.65-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![github actions](https://img.shields.io/github/actions/workflow/status/taiki-e/find-crate/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/find-crate/actions)
 
-<!-- tidy:crate-doc:start -->
+<!-- tidy:sync-markdown-to-rustdoc:start:src/lib.rs -->
+
 Find the crate name from the current `Cargo.toml`.
 
 When writing declarative macros, `$crate` representing the current crate is
@@ -103,7 +104,7 @@ for multiple crate names and versions. For general purposes,
 [rust-lang/futures-rs#2124]: https://github.com/rust-lang/futures-rs/pull/2124
 [proc-macro-crate]: https://github.com/bkchr/proc-macro-crate
 
-<!-- tidy:crate-doc:end -->
+<!-- tidy:sync-markdown-to-rustdoc:end -->
 
 [`Manifest::new`]: https://docs.rs/find-crate/latest/find_crate/struct.Manifest.html#method.new
 [`Manifest`]: https://docs.rs/find-crate/latest/find_crate/struct.Manifest.html
