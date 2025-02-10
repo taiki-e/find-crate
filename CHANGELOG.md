@@ -12,9 +12,11 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Update `toml` dependency to 0.8.
+- Support [version-less manifests](https://github.com/rust-lang/cargo/pull/12786) in crate_package.
 
-- Make `Dependencies` enum `#[non_exhaustive]`.
+- Update `toml` dependency to 0.8. (breaking change)
+
+- Make `Dependencies` enum `#[non_exhaustive]`. (breaking change)
 
 - Add `#[must_use]` to constructor and getters.
 

@@ -25,6 +25,7 @@ allowed_external_types = [
 doc-scrape-examples = false
 
 # Note: toml is public dependencies.
+# TODO: remove toml from public dependencies
 [dependencies]
 toml = { version = "0.8", default-features = false, features = ["parse"] }
 
