@@ -433,13 +433,11 @@ where
     where
         P: FnOnce(&str, &str) -> bool,
     {
-        value.as_table()?.get("package")?.as_str().and_then(|s| {
-            if predicate(s, version) {
-                Some(s.to_owned())
-            } else {
-                None
-            }
-        })
+        value
+            .as_table()?
+            .get("package")?
+            .as_str()
+            .and_then(|s| if predicate(s, version) { Some(s.to_owned()) } else { None })
     }
 
     fn version(value: &Value) -> Option<&str> {
