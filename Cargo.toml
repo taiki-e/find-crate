@@ -2,7 +2,7 @@
 name = "find-crate"
 version = "0.6.3" #publish:version
 edition = "2021"
-rust-version = "1.65" # For toml_edit (dep of toml)
+rust-version = "1.66" # For toml_edit (dep of toml)
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/find-crate"
 keywords = ["macros", "crate"]
