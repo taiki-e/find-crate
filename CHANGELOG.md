@@ -12,7 +12,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Update `toml` dependency to 0.8.
+- Update `toml` dependency to 0.9.
 
 - Make `Dependencies` enum `#[non_exhaustive]`.
 
