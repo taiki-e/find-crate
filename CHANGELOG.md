@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Support [version-less manifests](https://github.com/rust-lang/cargo/pull/12786) in `crate_package`.
+
 - Update `toml` dependency to 0.9.
 
 - Make `Dependencies` enum `#[non_exhaustive]`.
