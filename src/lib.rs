@@ -265,11 +265,8 @@ impl Manifest {
         Self::from_path(&manifest_path()?)
     }
 
-    // TODO: Should we support custom manifest paths?
-    //       And what should we do if the file is not found?
-    //       (should we use `CARGO_MANIFEST_DIR`? Or should we return an error?)
     /// Creates a new `Manifest` from the specified toml file.
-    fn from_path(manifest_path: &Path) -> Result<Self> {
+    pub fn from_path(manifest_path: &Path) -> Result<Self> {
         toml::from_str(&fs::read_to_string(manifest_path)?).map_err(Into::into).map(Self::from_toml)
     }
 
