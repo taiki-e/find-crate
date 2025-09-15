@@ -16,7 +16,8 @@ build.include-dependencies = true
 build.include-workspace = false # covered by tools/tidy.sh
 build.include-archives = true
 build.allow-build-scripts = [
-    { name = "serde" }, # via toml
+    { name = "serde_core" }, # via toml
+    { name = "serde" }, # https://github.com/serde-rs/serde/issues/2972
 ]
 build.bypass = [
 ]
