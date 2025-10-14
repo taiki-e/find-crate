@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+use std::str::FromStr as _;
+
 use find_crate::{Dependencies, Manifest};
 use semver::{Version, VersionReq};
 
@@ -20,7 +22,7 @@ fn dependencies() {
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
 
-    let mut manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let mut manifest = Manifest::from_str(MANIFEST).unwrap();
 
     assert_eq!(Dependencies::Default, manifest.dependencies);
 
@@ -61,7 +63,7 @@ fn renamed() {
     const NAME1: &str = "foo";
     const NAME2: &str = "bar";
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_str(MANIFEST).unwrap();
 
     assert_eq!("foo_renamed", manifest.find(|s| s == NAME1).unwrap().name);
     assert_eq!("0.1", manifest.find(|s| s == NAME1).unwrap().version);
@@ -87,7 +89,7 @@ fn target() {
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_str(MANIFEST).unwrap();
 
     assert_eq!(NAME1, manifest.find(|s| s == NAME1).unwrap().name);
     assert_eq!("0.1", manifest.find(|s| s == NAME1).unwrap().version);
@@ -116,7 +118,7 @@ fn find2() {
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_str(MANIFEST).unwrap();
 
     let version = Version::parse("0.2.0").unwrap();
 
@@ -137,7 +139,7 @@ fn crate_name() {
     version = "0.1.0"
     "#;
 
-    let manifest = Manifest::from_toml(toml::from_str(MANIFEST).unwrap());
+    let manifest = Manifest::from_str(MANIFEST).unwrap();
     let package = manifest.crate_package().unwrap();
     assert_eq!("crate_name", package.name);
     assert_eq!("0.1.0", package.version);
@@ -146,7 +148,7 @@ fn crate_name() {
     [package]
     name = "crate-name"
     "#;
-    let manifest = Manifest::from_toml(toml::from_str(manifest).unwrap());
+    let manifest = Manifest::from_str(manifest).unwrap();
     let package = manifest.crate_package().unwrap();
     assert_eq!("crate_name", package.name);
     assert_eq!("0.0.0", package.version);

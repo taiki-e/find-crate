@@ -1,3 +1,4 @@
+find_crate::error::TomlError: 88
 find_crate::error::Error: 88
 find_crate::Dependencies: 1
 find_crate::Package: 96
