@@ -134,6 +134,7 @@ mod track_size;
 
 mod error;
 
+use core::str::FromStr;
 use std::{
     env, fs,
     path::{Path, PathBuf},
@@ -141,7 +142,7 @@ use std::{
 
 use toml::value::{Table, Value};
 
-pub use crate::error::Error;
+pub use crate::error::{Error, TomlError};
 
 type Result<T, E = Error> = core::result::Result<T, E>;
 
@@ -267,13 +268,7 @@ impl Manifest {
 
     /// Creates a new `Manifest` from the specified toml file.
     pub fn from_path(manifest_path: &Path) -> Result<Self> {
-        toml::from_str(&fs::read_to_string(manifest_path)?).map_err(Into::into).map(Self::from_toml)
-    }
-
-    /// Creates a new `Manifest` from a toml table.
-    #[must_use]
-    pub fn from_toml(manifest: Table) -> Self {
-        Self { manifest, dependencies: Dependencies::default() }
+        Self::from_str(&fs::read_to_string(manifest_path)?)
     }
 
     /// Find the crate.
@@ -384,6 +379,18 @@ impl Manifest {
         };
 
         Ok(package)
+    }
+}
+
+impl FromStr for Manifest {
+    type Err = Error;
+
+    /// Creates a new `Manifest` from a string containing a TOML file.
+    fn from_str(manifest: &str) -> Result<Self, Self::Err> {
+        Ok(Self {
+            manifest: toml::from_str(manifest).map_err(|e| Error::Toml(TomlError { error: e }))?,
+            dependencies: Dependencies::default(),
+        })
     }
 }
 

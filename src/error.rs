@@ -5,8 +5,24 @@ use std::io;
 
 use crate::MANIFEST_DIR;
 
-// TODO: Hide error variants from a library's public error type to prevent
-// dependency updates from becoming breaking changes.
+/// An error which occurred while parsing the TOML manifest
+#[derive(Debug)]
+pub struct TomlError {
+    pub(super) error: toml::de::Error,
+}
+
+impl fmt::Display for TomlError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.error.fmt(f)
+    }
+}
+
+impl std::error::Error for TomlError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        Some(&self.error)
+    }
+}
+
 /// An error that occurred when getting manifest.
 #[derive(Debug)]
 #[non_exhaustive]
@@ -24,11 +40,11 @@ pub enum Error {
     /// [`find_crate`]: super::find_crate
     NotFound,
 
-    /// An error occurred while to open or to read the manifest file.
+    /// An error occurred while trying to open or to read the manifest file.
     Io(io::Error),
 
-    /// An error occurred while to parse the manifest file.
-    Toml(toml::de::Error),
+    /// An error occurred while trying to parse the manifest file.
+    Toml(TomlError),
 }
 
 impl fmt::Display for Error {
@@ -62,11 +78,5 @@ impl std::error::Error for Error {
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Self {
         Error::Io(e)
-    }
-}
-
-impl From<toml::de::Error> for Error {
-    fn from(e: toml::de::Error) -> Self {
-        Error::Toml(e)
     }
 }
