@@ -141,7 +141,7 @@ use std::{
 
 use toml::value::{Table, Value};
 
-pub use crate::error::Error;
+pub use self::error::Error;
 
 type Result<T, E = Error> = core::result::Result<T, E>;
 
