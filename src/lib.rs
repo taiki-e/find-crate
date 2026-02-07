@@ -104,6 +104,7 @@ for multiple crate names and versions. For general purposes,
 <!-- tidy:sync-markdown-to-rustdoc:end -->
 */
 
+#![no_std]
 #![doc(test(
     no_crate_inject,
     attr(allow(
@@ -127,6 +128,9 @@ for multiple crate names and versions. For general purposes,
     clippy::std_instead_of_core,
 )]
 
+extern crate alloc;
+extern crate std;
+
 #[cfg(test)]
 #[path = "gen/tests/assert_impl.rs"]
 mod assert_impl;
@@ -136,6 +140,7 @@ mod track_size;
 
 mod error;
 
+use alloc::{borrow::ToOwned as _, string::String};
 use std::{
     env, fs,
     path::{Path, PathBuf},
