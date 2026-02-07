@@ -41,6 +41,11 @@ macro_rules! assert_not_ref_unwind_safe {
     };
 }
 const _: fn() = || {
+    assert_send::<crate::error::TomlError>();
+    assert_sync::<crate::error::TomlError>();
+    assert_unpin::<crate::error::TomlError>();
+    assert_unwind_safe::<crate::error::TomlError>();
+    assert_ref_unwind_safe::<crate::error::TomlError>();
     assert_send::<crate::error::Error>();
     assert_sync::<crate::error::Error>();
     assert_unpin::<crate::error::Error>();

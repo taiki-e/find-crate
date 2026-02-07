@@ -25,6 +25,7 @@ fn write_size<T>(out: &mut String) {
 #[test]
 fn track_size() {
     let mut out = String::new();
+    write_size::<crate::error::TomlError>(&mut out);
     write_size::<crate::error::Error>(&mut out);
     write_size::<crate::Dependencies>(&mut out);
     write_size::<crate::Package>(&mut out);
