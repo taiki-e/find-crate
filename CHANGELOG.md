@@ -12,15 +12,25 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Expose `Manifest::from_path`.
-
-- Support [version-less manifests](https://github.com/rust-lang/cargo/pull/12786) in `crate_package`.
-
-- Update `toml` dependency to 0.9.
+- Remove `toml` from public dependencies to prevent `toml` updates from becoming breaking changes. ([#27](https://github.com/taiki-e/find-crate/pull/27), thanks @TechnoPorg)
+  - Remove `Manifest::from_toml`. Use `text.parse()`/`Manifest::from_str(text)` or `Manifest::from_path(path)` instead.
+  - Change the type of `Error::Toml` from `toml::de::Error` to `TomlError`.
 
 - Make `Dependencies` enum `#[non_exhaustive]`.
 
+- Implement `FromStr` for `Manifest`. ([#27](https://github.com/taiki-e/find-crate/pull/27), thanks @TechnoPorg)
+
+- Add `Manifest::from_path`.
+
+- Support [version-less manifests](https://github.com/rust-lang/cargo/pull/12786) in `crate_package`.
+
+- Support target names that contain ".".
+
 - Add `#[must_use]` to constructor and getters.
+
+- Update `toml` dependency to 0.9.
+
+- Enable [release immutability](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases).
 
 ## [0.6.3] - 2021-01-05
 
@@ -42,37 +52,37 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.5.0] - 2019-09-29
 
-- Made `Manifest::dependencies` and `Package::{name, version}` fields public.
+- Make `Manifest::dependencies` and `Package::{name, version}` fields public.
 
-- Added support for `target.cfg.dependencies`.
+- Add support for `target.cfg.dependencies`.
 
-- Added `Dependencies` enum to manage the kind of dependencies to be searched.
+- Add `Dependencies` enum to manage the kind of dependencies to be searched.
 
-- Removed `Manifest::lock()` and `ManifestLock`.
+- Remove `Manifest::lock()` and `ManifestLock`.
 
-- Removed some variant and field form `Error`.
+- Remove some variant and field form `Error`.
 
-- Removed `DEFAULT_DEPENDENCIES`.
+- Remove `DEFAULT_DEPENDENCIES`.
 
 ## [0.4.0] - 2019-06-16
 
 - Transition to Rust 2018. With this change, the minimum required version will go up to Rust 1.31.
 
-- Updated minimum `toml` version to 0.5.0.
+- Update minimum `toml` version to 0.5.0.
 
 ## [0.3.0] - 2019-02-21
 
-- Removed version dependent behavior.
+- Remove version dependent behavior.
 
 - Documentation improvements.
 
 ## [0.2.0] - 2019-02-13
 
-- Supported Rust 1.15.
+- Support Rust 1.15.
 
 ## [0.1.2] - 2019-02-13
 
-- Implemented `PartialEq` and `Eq` for `Package`.
+- Implement `PartialEq` and `Eq` for `Package`.
 
 ## [0.1.1] - 2019-02-13
 
