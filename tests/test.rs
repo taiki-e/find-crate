@@ -85,11 +85,15 @@ fn target() {
 
         [target.x86_64-unknown-linux-gnu.dependencies.baz]
         version = "0.3"
+
+        [target.thumbv8m.base-none-eabi.dependencies]
+        foo-bar = "0.1"
     "#;
 
     const NAME1: &str = "foo";
     const NAME2: &str = "bar";
     const NAME3: &str = "baz";
+    const NAME4: &str = "foo-bar";
 
     let manifest = Manifest::from_str(MANIFEST).unwrap();
 
@@ -101,6 +105,9 @@ fn target() {
 
     assert_eq!(NAME3, manifest.find(|s| s == NAME3).unwrap().name);
     assert_eq!("0.3", manifest.find(|s| s == NAME3).unwrap().version);
+
+    assert_eq!("foo_bar", manifest.find(|s| s == NAME4).unwrap().name);
+    assert_eq!("0.1", manifest.find(|s| s == NAME4).unwrap().version);
 }
 
 #[test]

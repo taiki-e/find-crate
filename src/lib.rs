@@ -414,11 +414,21 @@ fn find<P>(manifest: &Table, dependencies: Dependencies, mut predicate: P) -> Op
 where
     P: FnMut(&str, &str) -> bool,
 {
-    fn find_inner<P>(table: &Table, dependencies: &str, predicate: P) -> Option<Package>
+    fn find_inner<P>(table: &Table, dependencies: &str, predicate: &mut P) -> Option<Package>
     where
         P: FnMut(&str, &str) -> bool,
     {
         find_from_dependencies(table.get(dependencies)?.as_table()?, predicate)
+    }
+    fn find_target<P>(table: &Table, dependencies: &str, predicate: &mut P) -> Option<Package>
+    where
+        P: FnMut(&str, &str) -> bool,
+    {
+        table.values().find_map(|table| {
+            let table = table.as_table()?;
+            find_inner(table, dependencies, predicate)
+                .or_else(|| find_target(table, dependencies, predicate))
+        })
     }
 
     dependencies
@@ -427,11 +437,7 @@ where
         .find_map(|dependencies| find_inner(manifest, dependencies, &mut predicate))
         .or_else(|| {
             dependencies.as_slice().iter().find_map(|dependencies| {
-                manifest
-                    .get("target")?
-                    .as_table()?
-                    .values()
-                    .find_map(|table| find_inner(table.as_table()?, dependencies, &mut predicate))
+                find_target(manifest.get("target")?.as_table()?, dependencies, &mut predicate)
             })
         })
 }
