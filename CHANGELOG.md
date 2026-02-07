@@ -32,6 +32,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Update `toml` dependency to 0.9.
 
+  This increases the minimum supported Rust version (MSRV) to Rust 1.76.
+
 - Enable [release immutability](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases).
 
 ## [0.6.3] - 2021-01-05
