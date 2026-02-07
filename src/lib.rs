@@ -402,12 +402,9 @@ impl FromStr for Manifest {
 }
 
 fn manifest_path() -> Result<PathBuf> {
-    env::var_os(MANIFEST_DIR).ok_or(Error::NotFoundManifestDir).map(PathBuf::from).map(
-        |mut path| {
-            path.push("Cargo.toml");
-            path
-        },
-    )
+    let mut path: PathBuf = env::var_os(MANIFEST_DIR).ok_or(Error::NotFoundManifestDir)?.into();
+    path.push("Cargo.toml");
+    Ok(path)
 }
 
 fn find<P>(manifest: &Table, dependencies: Dependencies, mut predicate: P) -> Option<Package>
