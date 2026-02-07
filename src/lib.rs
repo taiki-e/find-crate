@@ -23,7 +23,7 @@ find-crate = "0.6"
 
 ## Examples
 
-[`find_crate`] gets the crate name from the current `Cargo.toml`.
+[`find_crate`] function gets the crate name from the current `Cargo.toml`.
 
 ```
 use find_crate::find_crate;
@@ -31,7 +31,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 fn import() -> TokenStream {
-    let name = find_crate(|s| s == "foo").unwrap().name;
+    let name = find_crate(|name| name == "foo").unwrap().name;
     let name = Ident::new(&name, Span::call_site());
     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
@@ -47,7 +47,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 fn import() -> TokenStream {
-    let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap().name;
+    let name = find_crate(|name| name == "foo" || name == "foo-core").unwrap().name;
     let name = Ident::new(&name, Span::call_site());
     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     quote!(extern crate #name as _foo;)
@@ -55,7 +55,7 @@ fn import() -> TokenStream {
 ```
 
 Using [`Manifest`] to search for multiple crates. It is much more efficient
-than using [`find_crate`] for each crate.
+than using [`find_crate`] function for each crate.
 
 ```
 use find_crate::Manifest;
@@ -69,22 +69,24 @@ const CRATE_NAMES: &[&[&str]] = &[
 ];
 
 fn imports() -> TokenStream {
-    let mut tts = TokenStream::new();
+    let mut tokens = TokenStream::new();
     let manifest = Manifest::new().unwrap();
 
     for names in CRATE_NAMES {
-        let name = manifest.find(|s| names.contains(&s)).unwrap().name;
+        let name = manifest.find(|name| names.contains(&name)).unwrap().name;
         let name = Ident::new(&name, Span::call_site());
         let import_name = format_ident!("_{}", names[0]);
         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
-        tts.extend(quote!(extern crate #name as #import_name;));
+        tokens.extend(quote!(extern crate #name as #import_name;));
     }
-    tts
+    tokens
 }
 ```
 
 By default it will be searched from `dependencies` and `dev-dependencies`.
-Also, [`find_crate`] and [`Manifest::new`] read `Cargo.toml` in
+This behavior can be adjusted by changing the [`Manifest::dependencies`] field.
+
+[`find_crate`] and [`Manifest::new`] functions read `Cargo.toml` in
 [`CARGO_MANIFEST_DIR`] as manifest.
 
 ## Alternatives
@@ -172,7 +174,7 @@ const MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
 /// use quote::quote;
 ///
 /// fn import() -> TokenStream {
-///     let name = find_crate(|s| s == "foo" || s == "foo-core").unwrap().name;
+///     let name = find_crate(|name| name == "foo" || name == "foo-core").unwrap().name;
 ///     let name = Ident::new(&name, Span::call_site());
 ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
 ///     quote!(extern crate #name as _foo;)
@@ -216,7 +218,7 @@ impl Dependencies {
     }
 }
 
-/// The package data. This has information on the current package name,
+/// The package information. This has information on the current package name,
 /// original package name, and specified version.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
@@ -227,7 +229,8 @@ pub struct Package {
     // If this is `None`, the value of `key` field is the original name.
     package: Option<String>,
 
-    /// The current name of the package. This is always a valid rust identifier.
+    /// The current name of the package. This is always a valid rust identifier
+    /// (`-` is replaced with `_`).
     pub name: String,
 
     /// The version requirement of the package. Returns `*` if no version
@@ -278,7 +281,7 @@ impl Manifest {
         Self::from_str(&fs::read_to_string(manifest_path)?)
     }
 
-    /// Find the crate.
+    /// Finds the crate with crate name, and returns its package information.
     ///
     /// The argument of the closure is the original name of the package.
     ///
@@ -291,7 +294,7 @@ impl Manifest {
     ///
     /// fn import() -> TokenStream {
     ///     let manifest = Manifest::new().unwrap();
-    ///     let name = manifest.find(|s| s == "foo" || s == "foo-core").unwrap().name;
+    ///     let name = manifest.find(|name| name == "foo" || name == "foo-core").unwrap().name;
     ///     let name = Ident::new(&name, Span::call_site());
     ///     // If your proc-macro crate is 2018 edition, use `quote!(use #name as _foo;)` instead.
     ///     quote!(extern crate #name as _foo;)
@@ -304,7 +307,7 @@ impl Manifest {
         self.find2(|s, _| predicate(s))
     }
 
-    /// Find the crate.
+    /// Finds the crate with crate name and version, and returns its package information.
     ///
     /// The first argument of the closure is the original name of the package
     /// and the second argument is the version of the package.
@@ -325,7 +328,7 @@ impl Manifest {
     ///     let version = Version::parse("0.3.0").unwrap();
     ///     let manifest = Manifest::new().unwrap();
     ///     let name = manifest
-    ///         .find2(|name, req| name == "foo" && check_version(req, &version))
+    ///         .find2(|name, req| name == "foo" && (req == "*" || check_version(req, &version)))
     ///         .unwrap()
     ///         .name;
     ///     let name = Ident::new(&name, Span::call_site());
@@ -445,7 +448,7 @@ where
             .as_table()?
             .get("package")?
             .as_str()
-            .and_then(|s| if predicate(s, version) { Some(s.to_owned()) } else { None })
+            .and_then(|name| if predicate(name, version) { Some(name.to_owned()) } else { None })
     }
 
     fn version(value: &Value) -> Option<&str> {

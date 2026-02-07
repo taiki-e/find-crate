@@ -15,11 +15,11 @@ fn dependencies() {
         version = "0.1.1"
 
         [build-dependencies]
-        bar = "0.2"
+        foo-bar = "0.2"
     "#;
 
     const NAME1: &str = "foo";
-    const NAME2: &str = "bar";
+    const NAME2: &str = "foo-bar";
     const NAME3: &str = "baz";
 
     let mut manifest = Manifest::from_str(MANIFEST).unwrap();
@@ -36,14 +36,14 @@ fn dependencies() {
     manifest.dependencies = Dependencies::Build;
     assert_eq!(None, manifest.find(|s| s == NAME1));
 
-    assert_eq!(NAME2, manifest.find(|s| s == NAME2).unwrap().name);
+    assert_eq!("foo_bar", manifest.find(|s| s == NAME2).unwrap().name);
     assert_eq!("0.2", manifest.find(|s| s == NAME2).unwrap().version);
 
     manifest.dependencies = Dependencies::Default;
     assert_eq!(None, manifest.find(|s| s == NAME2));
 
     manifest.dependencies = Dependencies::All;
-    assert_eq!(NAME2, manifest.find(|s| s == NAME2).unwrap().name);
+    assert_eq!("foo_bar", manifest.find(|s| s == NAME2).unwrap().name);
     assert_eq!("0.2", manifest.find(|s| s == NAME2).unwrap().version);
 
     assert_eq!(None, manifest.find(|s| s == NAME3));
