@@ -18,7 +18,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-find-crate = "0.6"
+find-crate = "0.7"
 ```
 
 ## Examples

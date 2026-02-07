@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-02-07
+
 - Remove `toml` from public dependencies to prevent `toml` updates from becoming breaking changes. ([#27](https://github.com/taiki-e/find-crate/pull/27), thanks @TechnoPorg)
   - Remove `Manifest::from_toml`. Use `text.parse()`/`Manifest::from_str(text)` or `Manifest::from_path(path)` instead.
   - Change the type of `Error::Toml` from `toml::de::Error` to `TomlError`.
@@ -92,7 +94,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.6.3...HEAD
+[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/taiki-e/find-crate/compare/v0.6.3...v0.7.0
 [0.6.3]: https://github.com/taiki-e/find-crate/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/taiki-e/find-crate/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/taiki-e/find-crate/compare/v0.6.0...v0.6.1
