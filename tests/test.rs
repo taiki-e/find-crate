@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+#![allow(clippy::needless_raw_string_hashes)]
+
 use std::str::FromStr as _;
 
 use find_crate::{Dependencies, Manifest};
@@ -99,6 +101,23 @@ fn target() {
 
     assert_eq!(NAME3, manifest.find(|s| s == NAME3).unwrap().name);
     assert_eq!("0.3", manifest.find(|s| s == NAME3).unwrap().version);
+}
+
+#[test]
+fn workspace() {
+    const MANIFEST: &str = r#"
+        [dependencies]
+        foo.workspace = true
+    "#;
+
+    const NAME1: &str = "foo";
+
+    let manifest = Manifest::from_str(MANIFEST).unwrap();
+
+    assert_eq!(Dependencies::Default, manifest.dependencies);
+
+    assert_eq!(NAME1, manifest.find(|s| s == NAME1).unwrap().name);
+    assert_eq!("*", manifest.find(|s| s == NAME1).unwrap().version);
 }
 
 #[test]
