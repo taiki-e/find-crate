@@ -76,7 +76,7 @@ fn imports() -> TokenStream {
     let manifest = Manifest::new().unwrap();
 
     for names in CRATE_NAMES {
-        let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
+        let name = manifest.find(|s| names.contains(&s)).unwrap().name;
         let name = Ident::new(&name, Span::call_site());
         let import_name = format_ident!("_{}", names[0]);
         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.

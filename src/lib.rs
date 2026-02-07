@@ -73,7 +73,7 @@ fn imports() -> TokenStream {
     let manifest = Manifest::new().unwrap();
 
     for names in CRATE_NAMES {
-        let name = manifest.find(|s| names.iter().any(|x| s == *x)).unwrap().name;
+        let name = manifest.find(|s| names.contains(&s)).unwrap().name;
         let name = Ident::new(&name, Span::call_site());
         let import_name = format_ident!("_{}", names[0]);
         // If your proc-macro crate is 2018 edition, use `quote!(use #name as #import_name;)` instead.
@@ -104,12 +104,15 @@ for multiple crate names and versions. For general purposes,
 <!-- tidy:sync-markdown-to-rustdoc:end -->
 */
 
+#![no_std]
 #![doc(test(
     no_crate_inject,
-    attr(
-        deny(warnings, rust_2018_idioms, single_use_lifetimes),
-        allow(dead_code, unused_variables)
-    )
+    attr(allow(
+        dead_code,
+        unused_variables,
+        clippy::undocumented_unsafe_blocks,
+        clippy::unused_trait_names,
+    ))
 ))]
 #![forbid(unsafe_code)]
 #![warn(
@@ -121,9 +124,12 @@ for multiple crate names and versions. For general purposes,
     clippy::exhaustive_structs,
     clippy::impl_trait_in_params,
     // clippy::missing_inline_in_public_items,
-    // clippy::std_instead_of_alloc,
+    clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
+
+extern crate alloc;
+extern crate std;
 
 #[cfg(test)]
 #[path = "gen/tests/assert_impl.rs"]
@@ -134,6 +140,7 @@ mod track_size;
 
 mod error;
 
+use alloc::{borrow::ToOwned as _, string::String};
 use core::str::FromStr;
 use std::{
     env, fs,
@@ -142,7 +149,7 @@ use std::{
 
 use toml::value::{Table, Value};
 
-pub use crate::error::{Error, TomlError};
+pub use self::error::{Error, TomlError};
 
 type Result<T, E = Error> = core::result::Result<T, E>;
 

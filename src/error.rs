@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+use alloc::string::String;
 use core::fmt;
 use std::io;
 
