@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `toml` dependency to 1.
+
 ## [0.7.0] - 2026-02-07
 
 - Remove `toml` from public dependencies to prevent `toml` updates from becoming breaking changes. ([#27](https://github.com/taiki-e/find-crate/pull/27), thanks @TechnoPorg)
