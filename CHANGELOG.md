@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-02-13
+
 - Update `toml` dependency to 1.
 
 ## [0.7.0] - 2026-02-07
@@ -98,7 +100,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/taiki-e/find-crate/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/taiki-e/find-crate/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/taiki-e/find-crate/compare/v0.6.3...v0.7.0
 [0.6.3]: https://github.com/taiki-e/find-crate/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/taiki-e/find-crate/compare/v0.6.1...v0.6.2
