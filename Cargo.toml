@@ -25,7 +25,7 @@ allowed_external_types = [
 doc-scrape-examples = false
 
 [dependencies]
-toml = { version = "1.0", default-features = false, features = ["std", "parse", "serde"] }
+toml = { version = "1", default-features = false, features = ["std", "parse", "serde"] }
 
 [dev-dependencies]
 proc-macro2 = { version = "1", default-features = false }
