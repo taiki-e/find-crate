@@ -34,6 +34,7 @@ pub enum Error {
     NotFoundManifestDir,
 
     /// The manifest is invalid for the following reason.
+    // TODO(semver): make this Box<str> if it reduces size
     InvalidManifest(String),
 
     /// The crate with the specified name not found. This error occurs only from [`find_crate`].
